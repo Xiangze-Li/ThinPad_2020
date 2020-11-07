@@ -8,4 +8,8 @@ thinpad_top.runs/
 /.Xil
 /.Xilinx
 
+vivado*.str
+vivado*.pid
+vivado*.zip
+
 .vscode/

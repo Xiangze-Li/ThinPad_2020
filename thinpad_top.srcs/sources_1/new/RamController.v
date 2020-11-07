@@ -55,7 +55,7 @@ module RamController
         S_U_RD_1    = 5'b11001,
         S_U_RD_2    = 5'b11010,
         S_U_RD_3    = 5'b11011,
-        S_U_WR_0    = 5'b11100;
+        S_U_WR_0    = 5'b11100,
         S_U_WR_1    = 5'b11101,
         S_U_WR_2    = 5'b11110,
         S_U_WR_3    = 5'b11111,
@@ -138,7 +138,7 @@ module RamController
 
     always @(posedge clk, posedge rst) begin
         if (rst) begin
-            stateBase <= S_IDLE;
+            state     <= S_IDLE;
             baseZ     <= 1'b1;
             baseCeN_R <= 1'b1;
             baseOeN_R <= 1'b1;
@@ -193,7 +193,7 @@ module RamController
                     else if (address == 32'h1000_0005) begin
                         // UART ״̬
                         if (ramRd) begin
-                            dataOut     <= { 24'h0000_00, 2'b00, uartTbrE & uartTsrE, 4'b0000, uartDataready };
+                            outData     <= { 24'h0000_00, 2'b00, uartTbrE & uartTsrE, 4'b0000, uartDataready };
                             state       <= S_B_RD_3;
                         end
                     end
@@ -206,7 +206,7 @@ module RamController
                 S_B_RD_2 : begin
                     baseCeN_R   <= 1'b1;
                     baseOeN_R   <= 1'b1;
-                    dataOut     <= baseIO;
+                    outData     <= baseIO;
                     state       <= S_B_RD_3;
                 end
                 S_B_RD_3 : begin
@@ -237,7 +237,7 @@ module RamController
                 S_E_RD_2 : begin
                     extCeN_R    <= 1'b1;
                     extOeN_R    <= 1'b1;
-                    dataOut     <= extIO;
+                    outData     <= extIO;
                     state       <= S_E_RD_3;
                 end
                 S_E_RD_3 : begin
@@ -269,7 +269,7 @@ module RamController
                 end
                 S_U_RD_3 : begin
                     uartRdN_R   <= 1'b1;
-                    dataOut     <= baseIO;
+                    outData     <= baseIO;
                     baseZ       <= 1'b1;
                     if (~ramRd)
                         state   <= S_IDLE;
