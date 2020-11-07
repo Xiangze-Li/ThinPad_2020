@@ -8,3 +8,5 @@ thinpad_top.runs/
 /.Xil
 /.Xilinx
 .DS_Store
+.vscode/
+
