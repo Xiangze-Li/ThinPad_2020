@@ -19,7 +19,7 @@ module RegFile(input wire clk,
     integer i;
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            for (i = 0; i<32; i = i+1) begin
+            for (i = 0; i < 32; i = i+1) begin
                 registers[i] <= 32'b0;
             end
         end
