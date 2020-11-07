@@ -12,4 +12,5 @@ vivado*.str
 vivado*.pid
 vivado*.zip
 
+.DS_Store
 .vscode/
