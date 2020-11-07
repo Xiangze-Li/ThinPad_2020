@@ -79,7 +79,7 @@ module thinpad_top(input wire clk_50M,              //50MHz 时钟输入
     
     wire regWr;
     wire pcWr, pcNowWr, pcSel;
-    wire memSel, memWr, memRd;  // memSel: address (aluout reg or pc)
+    wire ramSel, ramWr, ramRd, ramDone;  // ramSel: address (aluout reg or pc)
     wire instructionWr;
     wire aluFlagZero;
     
@@ -94,7 +94,7 @@ module thinpad_top(input wire clk_50M,              //50MHz 时钟输入
     
     wire[31:0] immOut, ramDataOut;
     wire[31:0] rs1Data, rs2Data, aluRes;
-    wire[31:0] pcSrc, baseAddr;  //baseAddr: origin address, undecoded
+    wire[31:0] pcSrc, ramAddr;  //ramAddr: origin address, undecoded
     
     reg[31:0] regA, regB, regC;  // reg for ALU
     reg[31:0] regInstruction, regRam;
@@ -104,8 +104,8 @@ module thinpad_top(input wire clk_50M,              //50MHz 时钟输入
     assign rs2 = regInstruction[24:20];
     assign rd  = regInstruction[11:07];
     
-    assign pcSrc    = pcSel ? aluRes : regC;
-    assign baseAddr = memSel ? regC : pc;
+    assign pcSrc   = pcSel ? aluRes : regC;
+    assign ramAddr = ramSel ? regC : pc;
     
     
     always @(*) begin
@@ -160,9 +160,9 @@ module thinpad_top(input wire clk_50M,              //50MHz 时钟输入
     .pcWr(pcWr),
     .pcNowWr(pcNowWr),
     .pcSel(pcSel),
-    .memSel(memSel),
-    .memWr(memWr),
-    .memRd(memRd),
+    .ramSel(ramSel),
+    .ramWr(ramWr),
+    .ramRd(ramRd),
     .ramByte(ramByte),
     .irWr(instructionWr),
     .regDSel(regDSel),
@@ -186,16 +186,18 @@ module thinpad_top(input wire clk_50M,              //50MHz 时钟输入
     .flagZero(aluFlagZero)
     );
     
-    MemController memController(
+    RamController ramController(
     .clk(clk),
     .rst(rst),
     
-    .baseDIn(regB),
-    .baseDOut(ramDataOut),
-    .baseA(baseAddr),
-    .baseWr(memWr),
-    .baseRd(memRd),
+    .dataIn(regB),
+    .dataOut(ramDataOut),
+    .address(ramAddr),
+    
+    .ramWr(ramWr),
+    .ramRd(ramRd),
     .ramByte(ramByte),
+    .ramDone(ramDone),
     
     .baseIO(base_ram_data),
     .baseAddr(base_ram_addr),
