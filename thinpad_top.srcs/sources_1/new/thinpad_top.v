@@ -59,6 +59,191 @@ module thinpad_top(input wire clk_50M,              //50MHz 时钟输入
                    output wire video_clk,           //像素时钟输出
                    output wire video_de);           //行数据有效信号，用于区分消隐区
     
+    wire clk, rst;
+    assign clk = clk_50M;
+    assign rst = reset_btn;
+    
+    // stages
+    reg[2:0] stage;
+    wire[2:0] stageNext;
+    parameter[2:0]
+    IDLE = 3'b000,
+    IF = 3'b001,
+    ID = 3'b010,
+    EXE = 3'b011,
+    MEM = 3'b100,
+    WB = 3'b101,
+    ERR = 3'b111;
+    
+    reg[31:0] pc, pcNow;
+    
+    wire regWr;
+    wire pcWr, pcNowWr, pcSel;
+    wire memSel, memWr, memRd;  // memSel: address (aluout reg or pc)
+    wire instructionWr;
+    wire aluFlagZero;
+    
+    wire[1:0] aluASel, aluBSel, regDSel;  // ALU opr A, ALU opr B, register data
+    wire[1:0] ramByte;  // number of bytes for ram to read
+    
+    wire[2:0] immSel, aluFunc3;
+    
+    wire[4:0] rs1, rs2, rd;
+    
+    wire[6:0] aluFunc7;
+    
+    wire[31:0] immOut, ramDataOut;
+    wire[31:0] rs1Data, rs2Data, aluRes;
+    wire[31:0] pcSrc, baseAddr;  //baseAddr: origin address, undecoded
+    
+    reg[31:0] regA, regB, regC;  // reg for ALU
+    reg[31:0] regInstruction, regRam;
+    reg[31:0] data2RF, oprandA, oprandB;
+    
+    assign rs1 = regInstruction[19:15];
+    assign rs2 = regInstruction[24:20];
+    assign rd  = regInstruction[11:07];
+    
+    assign pcSrc    = pcSel ? aluRes : regC;
+    assign baseAddr = memSel ? regC : pc;
+    
+    
+    always @(*) begin
+        case (regDSel)
+            2'b00 : data2RF = regRam;
+            2'b01 : data2RF = regC;
+            2'b10 : data2RF = pc;
+            2'b11 : data2RF = 32'b0;
+        endcase
+        
+        case (aluASel)
+            2'b00 : oprandA = pc;
+            2'b01 : oprandA = pcNow;
+            2'b10 : oprandA = regA;
+            2'b11 : oprandA = 32'b0;
+        endcase
+        
+        case (aluBSel)
+            2'b00 : oprandB = 32'h4;
+            2'b01 : oprandB = regB;
+            2'b10 : oprandB = immOut;
+            2'b11 : oprandB = 32'b0;
+        endcase
+    end
+    
+    RegFile regFile(
+    .clk(clk),
+    .rst(rst),
+    
+    .regWr(regWr),
+    .rs1(rs1),
+    .rs2(rs2),
+    .rd(rd),
+    .inData(data2RF),
+    
+    .rs1Data(rs1Data),
+    .rs2Data(rs2Data)
+    );
+    
+    ImmGen immGen(
+    .inst(regInstruction),
+    .immSel(immSel),
+    
+    .immOut(immOut)
+    );
+    
+    Decoder decoder(
+    .inst(regInstruction),
+    .flagZ(aluFlagZero),
+    .stage(stage),
+    
+    .pcWr(pcWr),
+    .pcNowWr(pcNowWr),
+    .pcSel(pcSel),
+    .memSel(memSel),
+    .memWr(memWr),
+    .memRd(memRd),
+    .ramByte(ramByte),
+    .irWr(instructionWr),
+    .regDSel(regDSel),
+    .immSel(immSel),
+    .regWr(regWr),
+    .aluASel(aluASel),
+    .aluBSel(aluBSel),
+    .func3(aluFunc3),
+    .func7(aluFunc7),
+    
+    .stageNext(stageNext),
+    );
+    
+    ALU alu(
+    .func3(aluFunc3),
+    .func7(aluFunc7),
+    .oprandA(oprandA),
+    .oprandB(oprandB),
+    
+    ,result(aluRes),
+    .flagZero(aluFlagZero)
+    );
+    
+    MemController memController(
+    .clk(clk),
+    .rst(rst),
+    
+    .baseDIn(regB),
+    .baseDOut(ramDataOut),
+    .baseA(baseAddr),
+    .baseWr(memWr),
+    .baseRd(memRd),
+    .ramByte(ramByte),
+    
+    .baseIO(base_ram_data),
+    .baseAddr(base_ram_addr),
+    .baseCeN(base_ram_ce_n),
+    .baseBeN(base_ram_be_n),
+    .baseOeN(base_ram_oe_n),
+    .baseWeN(base_ram_we_n),
+    
+    .extIO(ext_ram_addr),
+    .extAddr(ext_ram_addr),
+    .extCeN(ext_ram_ce_n),
+    .extBeN(ext_ram_be_n),
+    .extOeN(ext_ram_oe_n),
+    .extWeN(ext_ram_we_n),
+    
+    .uartDataready(uart_dataready),
+    .uartTbrE(uart_tbre),
+    .uartTsrE(uart_tsre),
+    .uartRdN(uart_rdn),
+    .uartWrn(uart_wrn)
+    );
+    
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            regA           <= 32'b0;
+            regB           <= 32'b0;
+            regC           <= 32'b0;
+            regRam         <= 32'b0;
+            pc             <= 32'b0;
+            pcNow          <= 32'b0;
+            regInstruction <= 32'b0;
+            stage          <= IDLE;
+        end
+        else begin
+            regA   <= rs1Data;
+            regB   <= rs2Data;
+            regC   <= aluRes;
+            regRam <= ramDataOut;
+            
+            stage <= stageNext;
+            
+            if (pcWr) pc <= pcSrc;
+            
+            if (pcNowWr) pcNow <= pc;
+            
+            if (instructionWr) regInstruction <= ramDataOut;
+        end
+    end
     /* ==  ==  ==  ==  ==  = Demo code begin ==  ==  ==  ==  ==  = */
     
     // // PLL分频示例
