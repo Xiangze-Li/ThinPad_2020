@@ -237,7 +237,15 @@ module thinpad_top(input wire clk_50M,              //50MHz 时钟输入
             regC   <= aluRes;
             regRam <= ramDataOut;
             
-            stage <= stageNext;
+            if ((stage == IF) || (stage == MEM)) begin
+                if(ramDone) begin
+                    stage <= stageNext;
+                end
+            end
+            else begin
+                stage <= stageNext;
+            end
+            
             
             if (pcWr) pc <= pcSrc;
             
