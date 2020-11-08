@@ -419,9 +419,7 @@ module Decoder(
     always @(*) begin
     // Next Stage Gen.
         case (stage)
-            IF1 :
-                stageNext = IF2;
-            IF2 :
+            IF :
                 stageNext = ID;
             ID  :
                 stageNext = EXE;
@@ -432,12 +430,12 @@ module Decoder(
                     OP_JALR     : stageNext = WB;
                     OP_AUIPC    : stageNext = WB;
                     OP_LUI      : stageNext = WB;
-                    OP_L, OP_S  : stageNext = ME;
+                    OP_L, OP_S  : stageNext = MEM;
                     OP_B        : stageNext = IF;
                     default     : stageNext = ERR;
                 endcase
             end
-            ME : begin
+            MEM : begin
                 case (opCode)
                     OP_S : stageNext = IF;
                     OP_L : stageNext = WB;
