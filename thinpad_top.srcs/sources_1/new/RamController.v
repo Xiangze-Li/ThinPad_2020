@@ -80,38 +80,39 @@ module RamController
 
     always @(*) begin
         // 处理位选
+        // 与 Load/Store 的 funct3[1:0] 保持一致.
         case ({ ramByte, address[1:0] })
-            4'b01_00 : begin
+            4'b00_00 : begin
                 outBeBuff = { {24{outData[7]}}, outData[7:0] };
                 inBeBuff = { 24'h0000_00, dataIn[7:0] };
                 ramBe = 4'b1110;
             end
-            4'b01_01 : begin
+            4'b00_01 : begin
                 outBeBuff = { {24{outData[15]}}, outData[15:8] };
                 inBeBuff = { 16'h0000, dataIn[7:0], 4'h0 };
                 ramBe = 4'b1101;
             end
-            4'b01_10 : begin
+            4'b00_10 : begin
                 outBeBuff = { {24{outData[23]}}, outData[23:16] };
                 inBeBuff = { 4'h0, dataIn[7:0], 16'h0000 };
                 ramBe = 4'b1011;
             end
-            4'b01_11 : begin
+            4'b00_11 : begin
                 outBeBuff = { {24{outData[31]}}, outData[31:24] };
                 inBeBuff = { dataIn[7:0], 24'h0000_00 };
                 ramBe = 4'b0111;
             end
-            4'b10_0X : begin
+            4'b01_0X : begin
                 outBeBuff = { {16{outData[15]}}, outData[15:0] };
                 inBeBuff = { 16'h0000, dataIn[15:0] };
                 ramBe = 4'b1100;
             end
-            4'b10_1X : begin
+            4'b01_1X : begin
                 outBeBuff = { {16{outData[31]}}, outData[31:16] };
                 inBeBuff = { dataIn[15:0], 16'h0000 };
                 ramBe = 4'b0011;
             end
-            4'b11_XX : begin
+            4'b1X_XX : begin
                 outBeBuff = outData;
                 inBeBuff = dataIn;
                 ramBe = 4'b0000;
