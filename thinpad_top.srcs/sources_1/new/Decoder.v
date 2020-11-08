@@ -419,6 +419,8 @@ module Decoder(
     always @(*) begin
     // Next Stage Gen.
         case (stage)
+            IDLE :
+                stageNext = IF;
             IF :
                 stageNext = ID;
             ID  :
