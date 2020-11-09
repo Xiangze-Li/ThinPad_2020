@@ -160,7 +160,7 @@ module RamController
         else begin
             case (state)
                 S_IDLE   : begin
-//                    if (address[31:22] == 10'b1000_0000_00) begin
+                    if (address[31:22] == 10'b1000_0000_00) begin
                         // 代码段
                         if (ramRd) begin
                             baseZ       <= 1'b1;
@@ -171,38 +171,38 @@ module RamController
                             baseData    <= inBeBuff;
                             state       <= S_B_WR_1;
                         end
-//                    end
-//                    else if (address[31:22] == 10'b1000_0000_01) begin
-//                        // 数据段
-//                        if (ramRd) begin
-//                            extZ        <= 1'b1;
-//                            state       <= S_E_RD_1;
-//                        end
-//                        else if (ramWr) begin
-//                            extZ        <= 1'b0;
-//                            extData     <= inBeBuff;
-//                            state       <= S_E_WR_1;
-//                        end
-//                    end
-//                    else if (address == 32'h1000_0000) begin
-//                        // UART 数据
-//                        if (ramRd) begin
-//                            baseZ       <= 1'b1;
-//                            state       <= S_U_RD_1;
-//                        end
-//                        else if (ramWr) begin
-//                            baseZ       <= 1'b0;
-//                            baseData    <= inBeBuff;
-//                            state       <= S_U_WR_0;
-//                        end
-//                    end
-//                    else if (address == 32'h1000_0005) begin
-//                        // UART 状态
-//                        if (ramRd) begin
-//                            outData     <= { 24'h0000_00, 2'b00, uartTbrE & uartTsrE, 4'b0000, uartDataready };
-//                            state       <= S_B_RD_3;
-//                        end
-//                    end
+                    end
+                    else if (address[31:22] == 10'b1000_0000_01) begin
+                        // 数据段
+                        if (ramRd) begin
+                            extZ        <= 1'b1;
+                            state       <= S_E_RD_1;
+                        end
+                        else if (ramWr) begin
+                            extZ        <= 1'b0;
+                            extData     <= inBeBuff;
+                            state       <= S_E_WR_1;
+                        end
+                    end
+                    else if (address == 32'h1000_0000) begin
+                        // UART 数据
+                        if (ramRd) begin
+                            baseZ       <= 1'b1;
+                            state       <= S_U_RD_1;
+                        end
+                        else if (ramWr) begin
+                            baseZ       <= 1'b0;
+                            baseData    <= inBeBuff;
+                            state       <= S_U_WR_0;
+                        end
+                    end
+                    else if (address == 32'h1000_0005) begin
+                        // UART 状态
+                        if (ramRd) begin
+                            outData     <= { 24'h0000_00, 2'b00, uartTbrE & uartTsrE, 4'b0000, uartDataready };
+                            state       <= S_B_RD_3;
+                        end
+                    end
                 end
                 S_B_RD_1 : begin
                     baseCeN_R   <= 1'b0;

@@ -234,7 +234,7 @@ module thinpad_top
             regB           <= 32'b0;
             regC           <= 32'b0;
             regRam         <= 32'b0;
-            pc             <= 32'b0;
+            pc             <= 32'h8000_0000;
             pcNow          <= 32'b0;
             regInstruction <= 32'b0;
             stage          <= IDLE;
