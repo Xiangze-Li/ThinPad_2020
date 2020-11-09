@@ -199,7 +199,7 @@ module RamController
                     else if (address == 32'h1000_0005) begin
                         // UART ״̬
                         if (ramRd) begin
-                            outData     <= { 24'h0000_00, 2'b00, uartTbrE & uartTsrE, 4'b0000, uartDataready };
+                            outData     <= { 16'h0000, 2'b00, uartTbrE & uartTsrE, 4'b0000, uartDataready, 8'h00 };
                             state       <= S_B_RD_3;
                         end
                     end
