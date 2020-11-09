@@ -120,7 +120,7 @@ module thinpad_top
             2'b00 : data2RF = regRam;
             2'b01 : data2RF = regC;
             2'b10 : data2RF = pc;
-            2'b11 : data2RF = 32'b0;
+            2'b11 : data2RF = immOut; //为了LUI指令，把11设置成了选择立即数生成器生成的左移12位后的数据
         endcase
 
         case (aluASel)
