@@ -164,7 +164,7 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= funct3[1:0];
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_I;
@@ -181,7 +181,7 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= funct3[1:0];
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_S;
@@ -305,7 +305,7 @@ module Decoder(
                         ramSel      <= 1'b1;
                         ramWr       <= 1'b1;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= funct3[1:0];
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_S;
@@ -320,9 +320,9 @@ module Decoder(
                         pcNowWr     <= 1'b0;
                         pcSel       <= 1'b1;
                         ramSel      <= 1'b1;
-                        ramWr       <= 1'b1;
-                        ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramWr       <= 1'b0;
+                        ramRd       <= 1'b1;
+                        ramByte     <= funct3[1:0];
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_I;
