@@ -256,7 +256,7 @@ module thinpad_top
             end
 
 
-            if (pcWr) pc <= pcSrc;
+            if (pcWr && !(stage == IF && ~ramDone)) pc <= pcSrc;
 
             if (pcNowWr) pcNow <= pc;
 
