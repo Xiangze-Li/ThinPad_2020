@@ -120,10 +120,10 @@ module RamController
         endcase
     end
 
-    // assign baseCeN  = 1'b0;
-    // assign extCeN   = 1'b0;
-    assign baseCeN  = baseCeN_R;
-    assign extCeN   = extCeN_R;
+    assign baseCeN  = 1'b0;
+    assign extCeN   = 1'b0;
+    // assign baseCeN  = baseCeN_R;
+    // assign extCeN   = extCeN_R;
     assign baseBeN  = ramBe;
     assign extBeN   = ramBe;
     assign baseOeN  = baseOeN_R;
@@ -158,18 +158,6 @@ module RamController
                     if (address[31:22] == 10'b1000_0000_00) begin
                         // 代码段
                         if (ramRd) begin
-                            extZ        <= 1'b1;
-                            state       <= S_E_RD_1;
-                        end
-                        else if (ramWr) begin
-                            extZ        <= 1'b0;
-                            extData     <= inBeBuff;
-                            state       <= S_E_WR_1;
-                        end
-                    end
-                    else if (address[31:22] == 10'b1000_0000_01) begin
-                        // 数据段
-                        if (ramRd) begin
                             baseZ       <= 1'b1;
                             state       <= S_B_RD_1;
                         end
@@ -177,6 +165,18 @@ module RamController
                             baseZ       <= 1'b0;
                             baseData    <= inBeBuff;
                             state       <= S_B_WR_1;
+                        end
+                    end
+                    else if (address[31:22] == 10'b1000_0000_01) begin
+                        // 数据段
+                        if (ramRd) begin
+                            extZ        <= 1'b1;
+                            state       <= S_E_RD_1;
+                        end
+                        else if (ramWr) begin
+                            extZ        <= 1'b0;
+                            extData     <= inBeBuff;
+                            state       <= S_E_WR_1;
                         end
                     end
                     else if (address == 32'h1000_0000) begin
