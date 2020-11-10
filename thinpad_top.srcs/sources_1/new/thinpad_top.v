@@ -66,7 +66,7 @@ module thinpad_top
     assign leds = disp; //ÈÃledsÏÔÊ¾µ÷ÊÔÄÚÈİ
 
     wire clk, rst;
-    assign clk = clk_50M;
+    assign clk = clk_11M0592;
     //assign clk = clock_btn;
     assign rst = reset_btn;
 
