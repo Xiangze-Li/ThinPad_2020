@@ -272,10 +272,10 @@ module RamController
                 end
                 S_U_RD_2 : begin
                     state       <= S_U_RD_3;
+                    outData     <= { 24'b0, baseIO[7:0] };
                 end
                 S_U_RD_3 : begin
                     uartRdN_R   <= 1'b1;
-                    outData     <= baseIO;
                     baseZ       <= 1'b1;
                     if (~ramRd)
                         state   <= S_IDLE;

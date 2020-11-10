@@ -103,6 +103,7 @@ module cpld_model(
         rx_ack = 1;
         @(negedge clk_out2);
         rx_ack = 0;
+        $display("received: 0x%02x", arg);
     end
     endtask
 endmodule
