@@ -62,7 +62,7 @@ module RamController
         S_U_WR_2    = 5'b11110,
         S_U_WR_3    = 5'b11111,
         //
-        S_EXCEP     = 5'b00011;
+        S_EXCEP     = 5'b00011,
         S_ERR       = 5'b00100;
 
     reg [4:0] state;
@@ -175,7 +175,7 @@ module RamController
                         addrMisal           <= 1'b1;
                         state               <= S_EXCEP;
                     end
-                    else
+                    else begin
                         if (address[31:22] == 10'b1000_0000_00) begin
                             // ´úÂë¶Î
                             if (ramRd) begin
