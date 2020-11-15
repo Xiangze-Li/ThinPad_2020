@@ -74,7 +74,10 @@ module RamController
     reg [31:0] extData;
     reg [31:0] outData;
 
-    assign ramDone = ((state[2] && ramWr) || (~state[2] && ramRd)) && (state[1:0] == 2'b11);
+    assign ramDone =
+        state == S_EXCEP ||
+        (((state[2] && ramWr) || (~state[2] && ramRd)) && (state[1:0] == 2'b11))
+        ;
 
     reg        addrMisal_R;
     reg [3:0]  ramBe;
