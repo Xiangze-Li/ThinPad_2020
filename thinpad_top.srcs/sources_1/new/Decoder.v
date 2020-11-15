@@ -24,6 +24,10 @@ module Decoder(
     input wire [31:0]   inst,
     input wire          flagZ,
     input wire [2:0]    stage,
+    input wire          addrMisal,
+    input wire          addrFault,
+    //ExceptionHandler的输出项
+    input wire          mode, //用来标记当前机器态？
 
     output reg          pcWr,
     output reg          pcNowWr,
@@ -31,7 +35,7 @@ module Decoder(
     output reg          ramSel,
     output reg          ramWr,
     output reg          ramRd,
-    output reg[1:0]    ramByte,
+    output reg[1:0]     ramByte,
     output reg          irWr,
     output reg [1:0]    regDSel,
     output reg [2:0]    immSel,
@@ -40,6 +44,10 @@ module Decoder(
     output reg [1:0]    aluBSel,
     output reg [2:0]    func3,
     output reg [6:0]    func7,
+    //下列全部是ExcepHandler的输入项
+    output reg [31:0]   mcauseIn, //根据异常原因给出
+    output reg          csrRd,//读使能
+    output reg [1:0]    csrWrOp,//写入选项
 
     output reg [2:0]    stageNext
     );
@@ -52,6 +60,7 @@ module Decoder(
         EXE = 3'b011,
         MEM = 3'b100,
         WB  = 3'b101,
+        EXC = 3'b110; //exception 异常处理状态
         ERR = 3'b111;
     
     parameter [6:0]
@@ -523,5 +532,67 @@ module Decoder(
                 stageNext = ERR;
         endcase
     end
+
+    /*always @(*) begin
+    // Next Stage Gen.
+    exc_type = 32h'ffffffff
+        case (stage)
+            IDLE :
+                stageNext = IF;
+            IF :
+                case({addrM, addrF})
+                    00  stageNext = ID; 
+                    01  stageNext = EXC; exc_type = 0 
+                    10  stageNext = EXC; exc_type = 1 
+            ID  :
+                case (opCode)
+                    OP_R        : stageNext = EXE;
+                    OP_I        : stageNext = EXE;
+                    OP_L        : stageNext = EXE;
+                    OP_S        : stageNext = EXE;
+                    OP_B        : stageNext = EXE;
+                    OP_JAL      : stageNext = EXE;
+                    OP_JALR     : stageNext = EXE;
+                    OP_LUI      : stageNext = WB;
+                    OP_AUIPC    : stageNext = EXE;
+                    OP_ECALL    : stageNext = EXC; exc_type = 8;
+                    OP_EBREAK   : stageNext = EXC; exc_type = 3;
+                    default     : stageNext = EXC; exc_type = 2 //还需要判断用户态、监管态
+                endcase
+            EXE : begin
+                case (opCode)
+                    OP_R        : stageNext = WB;
+                    OP_I        : stageNext = WB;
+                    OP_L        : stageNext = MEM;
+                    OP_S        : stageNext = MEM;
+                    OP_B        : stageNext = IF;
+                    OP_JAL      : stageNext = IF;
+                    OP_JALR     : stageNext = WB;
+                    OP_AUIPC    : stageNext = WB;
+                    default     : stageNext = ERR;
+                endcase
+            end
+            MEM : begin
+                case({addrM, addrF})
+                    00  case (opCode)
+                            OP_L : stageNext = WB;
+                            OP_S : stageNext = IF; 
+                            default: stageNext = ERR; 
+                    01  stageNext = EXC 
+                        case (opCode)
+                            OP_L : exc_type = 4；
+                            OP_S : exc_type = 6；
+                    10  stageNext = EXC 
+                        case (opCode)
+                            OP_L : exc_type = 5；
+                            OP_S : exc_type = 7； 
+                endcase
+            end
+            WB :
+                stageNext = IF;
+            default:
+                stageNext = ERR;
+        endcase
+    end*/
 
 endmodule
