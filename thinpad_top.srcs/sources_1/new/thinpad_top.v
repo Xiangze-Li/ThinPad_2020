@@ -100,7 +100,7 @@ module thinpad_top
     wire [11:0] csrAddr;
     wire [31:0] mcause;
     wire [31:0] csrDataIn, csrDataOut;
-    wire [31:0] excepHandleAddr;
+    wire [31:0] excepHandleAddr, epcOut;
     assign exceptionFlag = addrFalut || addrMisal;
 
 
@@ -173,7 +173,7 @@ module thinpad_top
             2'b00: pcSrc = regC;
             2'b01: pcSrc = aluRes;
             2'b10: pcSrc = excepHandleAddr;
-            2'b11: pcSrc = 0;
+            2'b11: pcSrc = epcOut;
         endcase
 
         case (regDSel)
@@ -227,7 +227,8 @@ module thinpad_top
         .csrDataOut(csrDataOut),
 
         .mode(cpuMode),
-        .handlerAddr(excepHandleAddr)
+        .handlerAddr(excepHandleAddr),
+        .epcOut(epcOut)
     );
 
     ImmGen immGen(
