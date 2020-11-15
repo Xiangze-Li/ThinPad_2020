@@ -96,7 +96,8 @@ module thinpad_top
     wire exceptionFlag;
     wire addrMisal, addrFalut;
     wire cpuMode;
-    wire csrRd, csrWr;
+    wire csrRd;
+    wire [1:0] csrWrOp;
     wire [11:0] csrAddr;
     wire [31:0] mcause;
     wire [31:0] csrDataIn, csrDataOut;
@@ -221,7 +222,7 @@ module thinpad_top
         .mcauseIn(mcause),
 
         .csrRd(csrRd),
-        .csrWr(csrWr),
+        .csrWrOp(csrWrOp),
         .csrAddr(csrAddr),
         .csrDataIn(csrDataIn),
         .csrDataOut(csrDataOut),
