@@ -220,6 +220,7 @@ module thinpad_top
 
         .excepFlag(exceptionFlag),
         .mcauseIn(mcause),
+        .pcNowIn(pcNow),
 
         .csrRd(csrRd),
         .csrWrOp(csrWrOp),
