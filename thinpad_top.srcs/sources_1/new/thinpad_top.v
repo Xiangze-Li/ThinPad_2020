@@ -116,8 +116,9 @@ module thinpad_top
 
     wire [31:0] immOut, ramDataOut;
     wire [31:0] rs1Data, rs2Data, aluRes;
-    wire [31:0] pcSrc, ramAddr;  //ramAddr: origin address, undecoded
+    wire [31:0] ramAddr;  //origin address, undecoded
 
+    reg  [31:0] pcSrc;
     reg  [31:0] regA, regB, regC;  // reg for ALU
     reg  [31:0] regInstruction, regRam;
     reg  [31:0] data2RF, oprandA, oprandB;
@@ -165,7 +166,6 @@ module thinpad_top
     assign rs2 = regInstruction[24:20];
     assign rd  = regInstruction[11:07];
 
-    assign pcSrc   = pcSel ? aluRes : regC;
     assign ramAddr = ramSel ? regC : pc;
 
     always @(*) begin
