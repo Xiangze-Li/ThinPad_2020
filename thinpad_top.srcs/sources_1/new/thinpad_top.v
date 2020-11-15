@@ -100,10 +100,10 @@ module thinpad_top
     wire [1:0] csrWrOp;
     wire [11:0] csrAddr;
     wire [31:0] mcause;
-    wire [31:0] csrDataIn, csrDataOut;
+    wire [31:0] csrDataOut;
     wire [31:0] excepHandleAddr, epcOut;
     assign exceptionFlag = addrFalut || addrMisal;
-
+    assign csrAddr = regInstruction[31:20];
 
     wire [1:0] aluASel, aluBSel, regDSel;  // ALU opr A, ALU opr B, register data
     wire [1:0] pcSel;
@@ -224,7 +224,7 @@ module thinpad_top
         .csrRd(csrRd),
         .csrWrOp(csrWrOp),
         .csrAddr(csrAddr),
-        .csrDataIn(csrDataIn),
+        .csrDataIn(regA),
         .csrDataOut(csrDataOut),
 
         .mode(cpuMode),
