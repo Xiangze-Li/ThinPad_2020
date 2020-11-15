@@ -82,17 +82,30 @@ module thinpad_top
         EXE = 3'b011,
         MEM = 3'b100,
         WB = 3'b101,
+        EXP = 3'b110,
         ERR = 3'b111;
 
     reg[31:0] pc, pcNow;
 
     wire regWr;
-    wire pcWr, pcNowWr, pcSel;
+    wire pcWr, pcNowWr;
     wire ramSel, ramWr, ramRd, ramDone;  // ramSel: address (aluout reg or pc)
     wire instructionWr;
     wire aluFlagZero, aluRorI;
+    // exception
+    wire exceptionFlag;
+    wire addrMisal, addrFalut;
+    wire cpuMode;
+    wire csrRd, csrWr;
+    wire [11:0] csrAddr;
+    wire [31:0] mcause;
+    wire [31:0] csrDataIn, csrDataOut;
+    wire [31:0] excepHandleAddr;
+    assign exceptionFlag = addrFalut || addrMisal;
+
 
     wire [1:0] aluASel, aluBSel, regDSel;  // ALU opr A, ALU opr B, register data
+    wire [1:0] pcSel;
     wire [1:0] ramByte;  // number of bytes for ram to read
 
     wire [2:0] immSel, aluFunc3;
@@ -156,6 +169,13 @@ module thinpad_top
     assign ramAddr = ramSel ? regC : pc;
 
     always @(*) begin
+        case (pcSel)
+            2'b00: pcSrc = regC;
+            2'b01: pcSrc = aluRes;
+            2'b10: pcSrc = excepHandleAddr;
+            2'b11: pcSrc = 0;
+        endcase
+
         case (regDSel)
             2'b00 : data2RF = regRam;
             2'b01 : data2RF = regC;
@@ -191,6 +211,23 @@ module thinpad_top
 
         .rs1Data(rs1Data),
         .rs2Data(rs2Data)
+    );
+
+    ExcepHandler exceptHandler(
+        .clk(clk),
+        .rst(rst),
+
+        .excepFlag(exceptionFlag),
+        .mcauseIn(mcause),
+
+        .csrRd(csrRd),
+        .csrWr(csrWr),
+        .csrAddr(csrAddr),
+        .csrDataIn(csrDataIn),
+        .csrDataOut(csrDataOut),
+
+        .mode(cpuMode),
+        .handlerAddr(excepHandleAddr)
     );
 
     ImmGen immGen(
@@ -267,7 +304,10 @@ module thinpad_top
         .uartTbrE(uart_tbre),
         .uartTsrE(uart_tsre),
         .uartRdN(uart_rdn),
-        .uartWrN(uart_wrn)
+        .uartWrN(uart_wrn),
+
+        .addrMisal(addrMisal),
+        .addrFault(addrFalut)
     );
 
     ClkGen clkgen(
