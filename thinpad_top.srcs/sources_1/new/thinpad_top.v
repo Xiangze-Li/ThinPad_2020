@@ -93,17 +93,15 @@ module thinpad_top
     wire instructionWr;
     wire aluFlagZero, aluRorI;
     // exception
-    wire exceptionFlag;
+    wire exceptionFlag, excepRetFlag;
     wire addrMisal, addrFalut;
     wire cpuMode;
-    wire csrRd;
     wire [1:0] csrWrOp;
     wire [11:0] csrAddr;
     wire [31:0] mcause;
     wire [31:0] csrDataOut;
     wire [31:0] excepHandleAddr, epcOut;
-    assign exceptionFlag = addrFalut || addrMisal;
-    assign csrAddr = regInstruction[31:20];
+
 
     wire [1:0] aluASel, aluBSel;  // ALU opr A, ALU opr B
     wire [1:0] pcSel;
@@ -163,6 +161,8 @@ module thinpad_top
     end
 
     // NOTE: MUX
+     assign csrAddr = regInstruction[31:20];
+
     assign rs1 = regInstruction[19:15];
     assign rs2 = regInstruction[24:20];
     assign rd  = regInstruction[11:07];
@@ -221,10 +221,10 @@ module thinpad_top
         .rst(rst),
 
         .excepFlag(exceptionFlag),
+        .retFlag(excepRetFlag),
         .mcauseIn(mcause),
         .pcNowIn(pcNow),
 
-        .csrRd(csrRd),
         .csrWrOp(csrWrOp),
         .csrAddr(csrAddr),
         .csrDataIn(regA),
@@ -247,6 +247,10 @@ module thinpad_top
         .flagZ(aluFlagZero),
         .stage(stage),
 
+        .mode(cpuMode),
+        .addrMisal(addrMisal),
+        .addrFault(addrFalut),
+
         .pcWr(pcWr),
         .pcNowWr(pcNowWr),
         .pcSel(pcSel),
@@ -260,9 +264,14 @@ module thinpad_top
         .regWr(regWr),
         .aluASel(aluASel),
         .aluBSel(aluBSel),
-        .aluRI(aluRorI),
         .func3(aluFunc3),
         .func7(aluFunc7),
+        .aluRI(aluRorI),
+
+        .exceptFlag(exceptionFlag),
+        .retFlag(excepRetFlag),
+        .mcauseIn(mcause),
+        .csrWrOp(csrWrOp),
 
         .stageNext(stageNext)
     );
