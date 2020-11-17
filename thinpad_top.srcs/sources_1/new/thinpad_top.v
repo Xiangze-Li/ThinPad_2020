@@ -82,20 +82,34 @@ module thinpad_top
         EXE = 3'b011,
         MEM = 3'b100,
         WB = 3'b101,
+        EXP = 3'b110,
         ERR = 3'b111;
 
     reg[31:0] pc, pcNow;
 
     wire regWr;
-    wire pcWr, pcNowWr, pcSel;
+    wire pcWr, pcNowWr;
     wire ramSel, ramWr, ramRd, ramDone;  // ramSel: address (aluout reg or pc)
     wire instructionWr;
     wire aluFlagZero, aluRorI;
+    // exception
+    wire exceptionFlag;
+    wire addrMisal, addrFalut;
+    wire cpuMode;
+    wire csrRd;
+    wire [1:0] csrWrOp;
+    wire [11:0] csrAddr;
+    wire [31:0] mcause;
+    wire [31:0] csrDataOut;
+    wire [31:0] excepHandleAddr, epcOut;
+    assign exceptionFlag = addrFalut || addrMisal;
+    assign csrAddr = regInstruction[31:20];
 
-    wire [1:0] aluASel, aluBSel, regDSel;  // ALU opr A, ALU opr B, register data
+    wire [1:0] aluASel, aluBSel;  // ALU opr A, ALU opr B
+    wire [1:0] pcSel;
     wire [1:0] ramByte;  // number of bytes for ram to read
 
-    wire [2:0] immSel, aluFunc3;
+    wire [2:0] immSel, aluFunc3, regDSel;  //immediate, funct3, register data
 
     wire [4:0] rs1, rs2, rd;
 
@@ -103,8 +117,9 @@ module thinpad_top
 
     wire [31:0] immOut, ramDataOut;
     wire [31:0] rs1Data, rs2Data, aluRes;
-    wire [31:0] pcSrc, ramAddr;  //ramAddr: origin address, undecoded
+    wire [31:0] ramAddr;  //origin address, undecoded
 
+    reg  [31:0] pcSrc;
     reg  [31:0] regA, regB, regC;  // reg for ALU
     reg  [31:0] regInstruction, regRam;
     reg  [31:0] data2RF, oprandA, oprandB;
@@ -152,15 +167,23 @@ module thinpad_top
     assign rs2 = regInstruction[24:20];
     assign rd  = regInstruction[11:07];
 
-    assign pcSrc   = pcSel ? aluRes : regC;
     assign ramAddr = ramSel ? regC : pc;
 
     always @(*) begin
+        case (pcSel)
+            2'b00: pcSrc = regC;
+            2'b01: pcSrc = aluRes;
+            2'b10: pcSrc = excepHandleAddr;
+            2'b11: pcSrc = epcOut;
+        endcase
+
         case (regDSel)
-            2'b00 : data2RF = regRam;
-            2'b01 : data2RF = regC;
-            2'b10 : data2RF = pc;
-            2'b11 : data2RF = immOut; //为了LUI指令，把11设置成了选择立即数生成器生成的左移12位后的数据
+            3'b000 : data2RF = regRam;
+            3'b001 : data2RF = regC;
+            3'b010 : data2RF = pc;
+            3'b011 : data2RF = immOut; //为了LUI指令，把11设置成了选择立即数生成器生成的左移12位后的数据
+            3'b100 : data2RF = csrDataOut;  //exception
+            default: data2RF = 0;
         endcase
 
         case (aluASel)
@@ -191,6 +214,25 @@ module thinpad_top
 
         .rs1Data(rs1Data),
         .rs2Data(rs2Data)
+    );
+
+    ExcepHandler exceptHandler(
+        .clk(clk),
+        .rst(rst),
+
+        .excepFlag(exceptionFlag),
+        .mcauseIn(mcause),
+        .pcNowIn(pcNow),
+
+        .csrRd(csrRd),
+        .csrWrOp(csrWrOp),
+        .csrAddr(csrAddr),
+        .csrDataIn(regA),
+        .csrDataOut(csrDataOut),
+
+        .mode(cpuMode),
+        .handlerAddr(excepHandleAddr),
+        .epcOut(epcOut)
     );
 
     ImmGen immGen(
@@ -267,7 +309,10 @@ module thinpad_top
         .uartTbrE(uart_tbre),
         .uartTsrE(uart_tsre),
         .uartRdN(uart_rdn),
-        .uartWrN(uart_wrn)
+        .uartWrN(uart_wrn),
+
+        .addrMisal(addrMisal),
+        .addrFault(addrFalut)
     );
 
     ClkGen clkgen(

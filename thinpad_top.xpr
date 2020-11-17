@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="44" Path="D:/rv_cpu/thinpad_top.xpr">
+<Project Version="7" Minor="44" Path="Z:/Users/xieyuntong/Documents/code/course/Computer-org/cod20-grp24/thinpad_top.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="1e0777dd008c45fcbaffd6b18f2c35e9"/>
@@ -30,20 +30,20 @@
     <Option Name="IPStaticSourceDir" Val="$PIPUSERFILESDIR/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSANumComputeUnits" Val="16"/>
-    <Option Name="WTXSimLaunchSim" Val="175"/>
+    <Option Name="WTXSimLaunchSim" Val="159"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="5"/>
-    <Option Name="WTModelSimExportSim" Val="5"/>
-    <Option Name="WTQuestaExportSim" Val="5"/>
-    <Option Name="WTIesExportSim" Val="5"/>
-    <Option Name="WTVcsExportSim" Val="5"/>
-    <Option Name="WTRivieraExportSim" Val="5"/>
-    <Option Name="WTActivehdlExportSim" Val="5"/>
+    <Option Name="WTXSimExportSim" Val="4"/>
+    <Option Name="WTModelSimExportSim" Val="4"/>
+    <Option Name="WTQuestaExportSim" Val="4"/>
+    <Option Name="WTIesExportSim" Val="4"/>
+    <Option Name="WTVcsExportSim" Val="4"/>
+    <Option Name="WTRivieraExportSim" Val="4"/>
+    <Option Name="WTActivehdlExportSim" Val="4"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -71,6 +71,13 @@
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/new/Decoder.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/ExcepHandler.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -105,7 +112,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/new/async.v">
+      <File Path="$PSRCDIR/sources_1/new/SEG7_LUT.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -113,7 +120,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/new/SEG7_LUT.v">
+      <File Path="$PSRCDIR/sources_1/new/async.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -253,7 +260,6 @@
         <Option Name="SelectedSimModel" Val="rtl"/>
         <Option Name="SrcSet" Val="sources_1"/>
         <Option Name="XSimWcfgFile" Val="$PPRDIR/tb_behav.wcfg"/>
-        <Option Name="xsim.simulate.runtime" Val="2ms"/>
       </Config>
     </FileSet>
     <FileSet Name="utils_1" Type="Utils" RelSrcDir="$PSRCDIR/utils_1">
@@ -305,12 +311,11 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="pll_example_synth_1" Type="Ft3:Synth" SrcSet="pll_example" Part="xc7a100tfgg676-2L" ConstrsSet="pll_example" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/pll_example_synth_1" IncludeInArchive="true">
+    <Run Id="pll_example_synth_1" Type="Ft3:Synth" SrcSet="pll_example" Part="xc7a100tfgg676-2L" ConstrsSet="pll_example" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2019"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2019"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
