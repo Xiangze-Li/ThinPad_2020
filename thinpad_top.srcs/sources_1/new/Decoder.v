@@ -472,8 +472,7 @@ module Decoder(
                                 aluBSel     <= 2'b11;
                                 func3       <= 3'b000;
                                 func7       <= 7'b0000000;
-                                exceptFlag  <= 1'b0//未发生异�?
-                                csrRd       <= 1'b0;//不需要读
+                                exceptFlag  <= 1'b0;//未发生异�?
                                 csrWrOp     <= 2'b00;//不需要写
                             end
                             default: begin //csr指令
@@ -533,9 +532,8 @@ module Decoder(
                 aluRI       <= 1'b0;
                 func3       <= 3'b000;
                 func7       <= 7'b0000000;
-                exceptFlag  <= 1'b1//发生异常
+                exceptFlag  <= 1'b1;//发生异常
                 retFlag     <= 1'b0;//只有mret指令�?�?1'b1
-                csrRd       <= 1'b0;//不需要读
                 csrWrOp     <= 2'b00;//不需要写
             end
             default : begin
@@ -554,7 +552,6 @@ module Decoder(
                 aluBSel     <= 2'bXX;
                 func3       <= 3'bXXX;
                 func7       <= 7'bXXXXXXX;
-                csrRd       <= 1'b0;//不需要读
                 csrWrOp     <= 2'b00;//不需要写
             end
         endcase
@@ -609,15 +606,15 @@ module Decoder(
 
     always @(*) begin
     // Next Stage Gen.
-    mcauseIn = 32h'ffffffff
+    mcauseIn = 32'hffffffff;
         case (stage)
             IDLE :
                 stageNext = IF;
             IF :
                 case ({addrFault, addrMisal})
                     2'b00       : stageNext = ID;
-                    2'b01       : stageNext = EXC; mcauseIn = 32'h00000000; //instruction address misaligned
-                    2'b10       : stageNext = EXC; mcauseIn = 32'h00000001; //instruction address fault
+                    2'b01       : begin stageNext = EXC; mcauseIn = 32'h00000000;end //instruction address misaligned
+                    2'b10       : begin stageNext = EXC; mcauseIn = 32'h00000001;end //instruction address fault
                     default: stageNext = ERR;
                 endcase 
             ID  :
