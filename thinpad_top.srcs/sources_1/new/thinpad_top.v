@@ -105,11 +105,11 @@ module thinpad_top
     assign exceptionFlag = addrFalut || addrMisal;
     assign csrAddr = regInstruction[31:20];
 
-    wire [1:0] aluASel, aluBSel, regDSel;  // ALU opr A, ALU opr B, register data
+    wire [1:0] aluASel, aluBSel;  // ALU opr A, ALU opr B
     wire [1:0] pcSel;
     wire [1:0] ramByte;  // number of bytes for ram to read
 
-    wire [2:0] immSel, aluFunc3;
+    wire [2:0] immSel, aluFunc3, regDSel;  //immediate, funct3, register data
 
     wire [4:0] rs1, rs2, rd;
 
@@ -178,10 +178,12 @@ module thinpad_top
         endcase
 
         case (regDSel)
-            2'b00 : data2RF = regRam;
-            2'b01 : data2RF = regC;
-            2'b10 : data2RF = pc;
-            2'b11 : data2RF = immOut; //为了LUI指令，把11设置成了选择立即数生成器生成的左移12位后的数据
+            3'b000 : data2RF = regRam;
+            3'b001 : data2RF = regC;
+            3'b010 : data2RF = pc;
+            3'b011 : data2RF = immOut; //为了LUI指令，把11设置成了选择立即数生成器生成的左移12位后的数据
+            3'b100 : data2RF = csrDataOut;  //exception
+            default: data2RF = 0;
         endcase
 
         case (aluASel)
