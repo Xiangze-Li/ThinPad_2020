@@ -1,22 +1,22 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date: 2020/11/08 14:33:20
-// Design Name: 
+// Design Name:
 // Module Name: Decoder
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -36,7 +36,7 @@ module Decoder(
     output reg          ramSel,
     output reg          ramWr,
     output reg          ramRd,
-    output reg[1:0]     ramByte,
+    output reg [1:0]    ramByte,
     output reg          irWr,
     output reg [1:0]    regDSel,
     output reg [2:0]    immSel,
@@ -45,6 +45,7 @@ module Decoder(
     output reg [1:0]    aluBSel,
     output reg [2:0]    func3,
     output reg [6:0]    func7,
+    output reg          aluRI,
     //下列全部是ExcepHandler的输入项
     output reg          exceptFlag,
     output reg [31:0]   mcauseIn, //根据异常原因给出
@@ -64,7 +65,7 @@ module Decoder(
         WB  = 3'b101,
         EXC = 3'b110; //exception 异常处理状态
         ERR = 3'b111;
-    
+
     parameter [6:0]
     // OpCode
         OP_R        = 7'b0110011,
@@ -84,6 +85,7 @@ module Decoder(
     wire [2:0]  funct3;
     wire [11:0] funct12;
     
+
     assign opCode = inst[6:0];
     assign funct3 = inst[14:12];
     assign funct7 = inst[31:25];
@@ -102,19 +104,20 @@ module Decoder(
         case (stage)
         // 每个阶段为当前阶段准备控制信号!
             IF : begin
-                pcWr        <= 1'b0;
-                pcNowWr     <= 1'b0;
+                pcWr        <= 1'b1;
+                pcNowWr     <= 1'b1;
                 pcSel       <= 2'b01;
                 ramSel      <= 1'b0;
                 ramWr       <= 1'b0;
                 ramRd       <= 1'b1;
                 ramByte     <= 2'b10; //IF阶段按字读取指令
-                irWr        <= 1'b1; 
+                irWr        <= 1'b1;
                 regDSel     <= 2'b11;
                 immSel      <= IMM_N;
                 regWr       <= 1'b0;
                 aluASel     <= 2'b00;
                 aluBSel     <= 2'b00;
+                aluRI       <= 1'b0;
                 func3       <= 3'b000;
                 func7       <= 7'b0000000;
             end
@@ -125,13 +128,14 @@ module Decoder(
                 ramSel      <= 1'b0;
                 ramWr       <= 1'b0;
                 ramRd       <= 1'b0;
-                ramByte     <= 2'b10; //ID阶段不访存
+                ramByte     <= 2'b11; //ID阶段不访存
                 irWr        <= 1'b0;
                 regDSel     <= 2'b11;
                 immSel      <= IMM_N; //为啥选了个B？
                 regWr       <= 1'b0;
                 aluASel     <= 2'b01;
                 aluBSel     <= 2'b10;
+                aluRI       <= 1'b0;
                 func3       <= 3'b000;
                 func7       <= 7'b0000000;
             end
@@ -144,13 +148,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_N;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b10;
                         aluBSel     <= 2'b01;
+                        aluRI       <= 1'b0;
                         func3       <= funct3;
                         func7       <= funct7;
                     end
@@ -161,13 +166,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_I;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b10;
                         aluBSel     <= 2'b10;
+                        aluRI       <= 1'b1;
                         func3       <= funct3;
                         func7       <= funct7;
                     end
@@ -178,13 +184,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= funct3[1:0];
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_I;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b10;
                         aluBSel     <= 2'b10;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -195,13 +202,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= funct3[1:0];
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_S;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b10;
                         aluBSel     <= 2'b10;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -212,13 +220,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_N;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b10;
                         aluBSel     <= 2'b01;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0100000; //branch指令需要将两个数相减判断结果是否为0
                     end
@@ -229,30 +238,32 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b10; //JAL要将pc+4写入rd
                         immSel      <= IMM_J;
                         regWr       <= 1'b1;
-                        aluASel     <= 2'b00; //PC
+                        aluASel     <= 2'b01; // not PC, but PC_NOW
                         aluBSel     <= 2'b10; //imm
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
                     OP_JALR : begin //JALR EXE周期只做ALU运算
-                        pcWr        <= 1'b0; 
+                        pcWr        <= 1'b0;
                         pcNowWr     <= 1'b0;
                         pcSel       <= 2'b00;
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_I;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b10; //rs1
                         aluBSel     <= 2'b10; //imm
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -264,7 +275,7 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_U;
@@ -281,13 +292,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_U;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b01; //选择pc_now
                         aluBSel     <= 2'b10; //imm
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -298,13 +310,14 @@ module Decoder(
                         ramSel      <= 1'bX;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'bXX;
                         immSel      <= 3'bXXX;
                         regWr       <= 1'b0;
                         aluASel     <= 2'bXX;
                         aluBSel     <= 2'bXX;
+                        aluRI       <= 1'bX;
                         func3       <= 3'bXXX;
                         func7       <= 7'bXXXXXXX;
                     end
@@ -319,13 +332,14 @@ module Decoder(
                         ramSel      <= 1'b1;
                         ramWr       <= 1'b1;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= funct3[1:0];
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_S;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b10;
                         aluBSel     <= 2'b10;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -334,32 +348,34 @@ module Decoder(
                         pcNowWr     <= 1'b0;
                         pcSel       <= 2'b01;
                         ramSel      <= 1'b1;
-                        ramWr       <= 1'b1;
-                        ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramWr       <= 1'b0;
+                        ramRd       <= 1'b1;
+                        ramByte     <= funct3[1:0];
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_I;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b10;
                         aluBSel     <= 2'b10;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
                     default : begin
                         pcWr        <= 1'b0;
                         pcNowWr     <= 1'b0;
-                        pcSel       <= 2'b01;
+                        pcSel       <= 2'bXX;
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'bXX;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_N;
                         regWr       <= 1'b0;
                         aluASel     <= 2'b11;
                         aluBSel     <= 2'b11;
+                        aluRI       <= 1'bX;
                         func3       <= 3'bXXX;
                         func7       <= 7'bXXXXXXX;
                     end
@@ -374,13 +390,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b01; //选择regC写回rd
                         immSel      <= IMM_N;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
                         aluBSel     <= 2'b11;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -391,13 +408,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b00; //写回ram中的数据
                         immSel      <= IMM_N;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
                         aluBSel     <= 2'b11;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -408,13 +426,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b10; //写回pc+4
                         immSel      <= IMM_N;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
                         aluBSel     <= 2'b11;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -425,13 +444,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11; //rd<-imm
-                        immSel      <= IMM_N;
+                        immSel      <= IMM_U;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
                         aluBSel     <= 2'b11;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -442,13 +462,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b01; //rd<-C（ pc + imm）
                         immSel      <= IMM_N;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
                         aluBSel     <= 2'b11;
+                        aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end
@@ -503,13 +524,14 @@ module Decoder(
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
-                        ramByte     <= func3[1:0];
+                        ramByte     <= 2'b11;
                         irWr        <= 1'b0;
                         regDSel     <= 2'b11;
                         immSel      <= IMM_N;
                         regWr       <= 1'b0;
                         aluASel     <= 2'bXX;
                         aluBSel     <= 2'bXX;
+                        aluRI       <= 1'b0;
                         func3       <= 3'bXXX;
                         func7       <= 7'bXXXXXXX;
                     end
@@ -549,6 +571,7 @@ module Decoder(
                 regWr       <= 1'b0;
                 aluASel     <= 2'bXX;
                 aluBSel     <= 2'bXX;
+                aluRI       <= 1'bX;
                 func3       <= 3'bXXX;
                 func7       <= 7'bXXXXXXX;
                 csrRd       <= 1'b0;//不需要读
@@ -593,7 +616,7 @@ module Decoder(
             MEM : begin
                 case (opCode)
                     OP_L : stageNext = WB;
-                    OP_S : stageNext = IF; 
+                    OP_S : stageNext = IF;
                     default: stageNext = ERR;
                 endcase
             end
@@ -632,8 +655,8 @@ module Decoder(
                         case (funct3)
                             3'b000 : 
                                 case (funct12)
-                                    12'b000000000000 : stageNext = Exc; mcauseIn = 32'h00000008; //environment call from U-mode
-                                    12'b000000000001 : stageNext = Exc; mcauseIn = 32'h00000003; //breakpoint
+                                    12'b000000000000 : stageNext = EXC; mcauseIn = 32'h00000008; //environment call from U-mode
+                                    12'b000000000001 : stageNext = EXC; mcauseIn = 32'h00000003; //breakpoint
                                     12'b001100000010 : stageNext = WB; //mret
                                     default: stageNext = ERR; //其他情况则为未定义指令
                                 endcase
@@ -660,7 +683,7 @@ module Decoder(
                 case ({addrFault, addrMisal, opCode})
                     {2'b00, OP_L}       : stageNext = WB;
                     {2'b00, OP_S}       : stageNext = IF;
-                    {2'b01, OP_L}       : stageNext = EXC; mcauseIn = 32'h00000004; //load address misaligned
+                    {2'b01, OP_L}       : begin stageNext = EXC; mcauseIn = 32'h00000004;end //load address misaligned
                     {2'b01, OP_S}       : stageNext = EXC; mcauseIn = 32'h00000006; //store address misaligned
                     {2'b10, OP_L}       : stageNext = EXC; mcauseIn = 32'h00000005; //load address fault
                     {2'b10, OP_S}       : stageNext = EXC; mcauseIn = 32'h00000007; //store address fault

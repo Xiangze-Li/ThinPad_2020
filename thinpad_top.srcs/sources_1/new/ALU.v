@@ -2,6 +2,7 @@
 
 module ALU
 (
+    input  wire                 ri,
     input  wire signed [31:0]   oprandA,
     input  wire signed [31:0]   oprandB,
     input  wire        [2:0]    funct3,
@@ -14,56 +15,51 @@ module ALU
     assign flagZero = &(~result);
 
     wire [31:0] pcnt;
-    wire [31:0] revB;
-
-    assign revB = ~oprandB;
-
-    // case({ funct3, funct7 })
-    //     10'b000_0X00000 : // ADD/SUB
-    //         result = oprandA + (funct7[5] ? -oprandB : oprandB);
-    //     10'b001_0000000 : // SLL
-    //         result = oprandA << oprandB[4:0];
-    //     10'b001_0110000 : // PCNT
-    //         result = (oprandB[11:0] == 12'b0110_0000_0010 ? pcnt : 32'hFFFF_FFFF);
-    //     10'b100_0X00000 : // XOR/XNOR
-    //         result = oprandA ^ (funct7[5] ? ~oprandB : oprandB);
-    //     10'b100_0000100 : // PACK
-    //         result = { oprandB[15:0], oprandA[15:0] };
-    //     10'b101_0X00000 : // SRL/SRA
-    //         result = (funct7[5] ? oprandA >>> oprandB[4:0] : oprandA >> oprandB[4:0]);
-    //     10'b110_0000000 : // OR
-    //         result = oprandA | oprandB;
-    //     10'b111_0000000 : // AND
-    //         result = oprandA & oprandB;
-    //     default :
-    //         result = 32'hFFFF_FFFF;
-    // endcase
 
     // - NOTE: ALU Logics
     always @(*) begin
-        case (funct3)
-            3'b000 :
-                result = oprandA + (funct7[5] ? revB + 1 : oprandB);
-            3'b001 : begin
-                case (funct7[5:4])
-                    2'b00 : result = oprandA << oprandB[4:0];
-                    2'b11 : result = pcnt;
-                    default: result = 32'hFFFF_FFFF;
-                endcase
-            end
-            3'b100 :
-                result = (funct7[2] ?
+        if (ri) begin
+            // I-type
+            case (funct3)
+                3'b000 :
+                    result = oprandA + oprandB;
+                3'b001 : begin
+                    case (funct7)
+                        7'b0000000 :
+                            result = oprandA << oprandB[4:0];
+                        7'b0110000 :
+                            result = pcnt;
+                        default :
+                            result = 32'hF0F0_F0F0;
+                    endcase
+                end
+                3'b101 :
+                    result = (funct7[5] ? oprandA >>> oprandB[4:0] : oprandA >> oprandB[4:0]);
+                3'b110 :
+                    result = oprandA | oprandB;
+                3'b111 :
+                    result = oprandA & oprandB;
+                default :
+                    result = 32'hF0F0_F0F0;
+            endcase
+        end
+        else begin
+            // R-type
+            case (funct3)
+                3'b000 :
+                    result = funct7[5] ? oprandA - oprandB : oprandA + oprandB;
+                3'b100 :
+                    result = (funct7[2] ?
                             { oprandB[15:0], oprandA[15:0] } :
-                            oprandA ^ (funct7[5] ? revB : oprandB));
-            3'b101 :
-                result = (funct7[5] ? oprandA >>> oprandB[4:0] : oprandA >> oprandB[4:0]);
-            3'b110 :
-                result = oprandA | oprandB;
-            3'b111 :
-                result = oprandA & oprandB;
-            default:
-                result = 32'hFFFF_FFFF;
-        endcase
+                            oprandA ^ (funct7[5] ? ~oprandB : oprandB));
+                3'b110 :
+                    result = oprandA | oprandB;
+                3'b111 :
+                    result = oprandA & oprandB;
+                default:
+                    result = 32'hF0F0_F0F0;
+            endcase
+        end
     end
 
     PCNT pcnt_module(oprandA, pcnt);

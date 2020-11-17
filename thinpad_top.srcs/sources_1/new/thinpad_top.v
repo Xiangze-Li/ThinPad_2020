@@ -2,42 +2,42 @@
 
 module thinpad_top
 (
-    input wire clk_50M,              //50MHz æ—¶é’Ÿè¾“å…¥
-    input wire clk_11M0592,          //11.0592MHz æ—¶é’Ÿè¾“å…¥ï¼ˆï¿½?ï¿½ç”¨ï¼Œå¯ä¸ç”¨ï¿½?
-    input wire clock_btn,            //BTN5æ‰‹åŠ¨æ—¶é’ŸæŒ‰é’®å¼€å…³ï¼Œå¸¦æ¶ˆæŠ–ç”µï¿½?ï¼ŒæŒ‰ä¸‹æ—¶ï¿½?1
-    input wire reset_btn,            //BTN6æ‰‹åŠ¨å¤ä½æŒ‰é’®å¼€å…³ï¼Œå¸¦æ¶ˆæŠ–ç”µï¿½?ï¼ŒæŒ‰ä¸‹æ—¶ï¿½?1
-    input wire[3:0] touch_btn,       //BTN1~BTN4ï¼ŒæŒ‰ï¿½?å¼€å…³ï¼ŒæŒ‰ä¸‹æ—¶ä¸º1
-    input wire[31:0] dip_sw,         //32ä½æ‹¨ç å¼€å…³ï¼Œæ‹¨åˆ°â€œONâ€æ—¶ï¿½?1
-    output wire[15:0] leds,          //16ä½LEDï¼Œè¾“å‡ºæ—¶1ç‚¹äº®
-    output wire[7:0] dpy0,           //æ•°ç ç®¡ä½ä½ä¿¡å·ï¼ŒåŒ…æ‹¬å°æ•°ç‚¹ï¼Œè¾“å‡º1ç‚¹äº®
-    output wire[7:0] dpy1,           //æ•°ç ç®¡é«˜ä½ä¿¡å·ï¼ŒåŒ…æ‹¬å°æ•°ç‚¹ï¼Œè¾“å‡º1ç‚¹äº®
-    output wire uart_rdn,            //è¯»ä¸²å£ä¿¡å·ï¼Œä½æœ‰ï¿½?
-    output wire uart_wrn,            //å†™ä¸²å£ä¿¡å·ï¼Œä½æœ‰ï¿½?
-    input wire uart_dataready,       //ä¸²å£æ•°æ®å‡†ï¿½?ï¿½å¥½
-    input wire uart_tbre,            //å‘é€æ•°ï¿½?æ ‡å¿—
-    input wire uart_tsre,            //æ•°æ®å‘é€å®Œæ¯•æ ‡ï¿½?
-    inout wire[31:0] base_ram_data,  //BaseRAMæ•°æ®ï¼Œä½8ä½ä¸CPLDä¸²å£æ§åˆ¶å™¨å…±ï¿½?
-    output wire[19:0] base_ram_addr, //BaseRAMåœ°å€
-    output wire[3:0] base_ram_be_n,  //BaseRAMå­—èŠ‚ä½¿èƒ½ï¼Œä½æœ‰æ•ˆã€‚ï¿½?ï¿½æœä¸ä½¿ç”¨å­—èŠ‚ä½¿èƒ½ï¼Œè¯·ä¿æŒä¸º0
-    output wire base_ram_ce_n,       //BaseRAMç‰‡é€‰ï¼Œä½æœ‰ï¿½?
-    output wire base_ram_oe_n,       //BaseRAMè¯»ä½¿èƒ½ï¼Œä½æœ‰ï¿½?
-    output wire base_ram_we_n,       //BaseRAMå†™ä½¿èƒ½ï¼Œä½æœ‰ï¿½?
-    inout wire[31:0] ext_ram_data,   //ExtRAMæ•°æ®
-    output wire[19:0] ext_ram_addr,  //ExtRAMåœ°å€
-    output wire[3:0] ext_ram_be_n,   //ExtRAMå­—èŠ‚ä½¿èƒ½ï¼Œä½æœ‰æ•ˆã€‚ï¿½?ï¿½æœä¸ä½¿ç”¨å­—èŠ‚ä½¿èƒ½ï¼Œè¯·ä¿æŒä¸º0
-    output wire ext_ram_ce_n,        //ExtRAMç‰‡é€‰ï¼Œä½æœ‰ï¿½?
-    output wire ext_ram_oe_n,        //ExtRAMè¯»ä½¿èƒ½ï¼Œä½æœ‰ï¿½?
-    output wire ext_ram_we_n,        //ExtRAMå†™ä½¿èƒ½ï¼Œä½æœ‰ï¿½?
-    output wire txd,                 //ç›´è¿ä¸²å£å‘é€ï¿½??
-    input wire rxd,                  //ç›´è¿ä¸²å£æ¥æ”¶ï¿½?
-    output wire [22:0]flash_a,       //Flashåœ°å€ï¼Œa0ä»…åœ¨8bitæ¨¡å¼æœ‰æ•ˆï¿½?16bitæ¨¡å¼æ— æ„ï¿½?
-    inout wire [15:0]flash_d,        //Flashæ•°æ®
-    output wire flash_rp_n,          //Flashå¤ä½ä¿¡å·ï¼Œä½æœ‰æ•ˆ
-    output wire flash_vpen,          //Flashå†™ä¿æŠ¤ä¿¡å·ï¼Œä½ç”µå¹³æ—¶ä¸èƒ½æ“¦é™¤ã€çƒ§ï¿½?
-    output wire flash_ce_n,          //Flashç‰‡é€‰ä¿¡å·ï¼Œä½æœ‰ï¿½?
-    output wire flash_oe_n,          //Flashè¯»ä½¿èƒ½ä¿¡å·ï¼Œä½æœ‰ï¿½?
-    output wire flash_we_n,          //Flashå†™ä½¿èƒ½ä¿¡å·ï¼Œä½æœ‰ï¿½?
-    output wire flash_byte_n,        //Flash 8bitæ¨¡å¼é€‰æ‹©ï¼Œä½æœ‰æ•ˆã€‚åœ¨ä½¿ç”¨flashï¿½?16ä½æ¨¡å¼æ—¶è¯·ï¿½?ï¿½ä¸º1
+    input wire clk_50M,              //50MHz Ê±ÖÓÊäÈë
+    input wire clk_11M0592,          //11.0592MHz Ê±ÖÓÊäÈë£¨???ÓÃ£¬¿É²»ÓÃ??
+    input wire clock_btn,            //BTN5ÊÖ¶¯Ê±ÖÓ°´Å¥¿ª¹Ø£¬´øÏû¶¶µç??£¬°´ÏÂÊ±??1
+    input wire reset_btn,            //BTN6ÊÖ¶¯¸´Î»°´Å¥¿ª¹Ø£¬´øÏû¶¶µç??£¬°´ÏÂÊ±??1
+    input wire[3:0] touch_btn,       //BTN1~BTN4£¬°´??¿ª¹Ø£¬°´ÏÂÊ±Îª1
+    input wire[31:0] dip_sw,         //32Î»²¦Âë¿ª¹Ø£¬²¦µ½¡°ON¡±Ê±??1
+    output wire[15:0] leds,          //16Î»LED£¬Êä³öÊ±1µãÁÁ
+    output wire[7:0] dpy0,           //ÊıÂë¹ÜµÍÎ»ĞÅºÅ£¬°üÀ¨Ğ¡Êıµã£¬Êä³ö1µãÁÁ
+    output wire[7:0] dpy1,           //ÊıÂë¹Ü¸ßÎ»ĞÅºÅ£¬°üÀ¨Ğ¡Êıµã£¬Êä³ö1µãÁÁ
+    output wire uart_rdn,            //¶Á´®¿ÚĞÅºÅ£¬µÍÓĞ??
+    output wire uart_wrn,            //Ğ´´®¿ÚĞÅºÅ£¬µÍÓĞ??
+    input wire uart_dataready,       //´®¿ÚÊı¾İ×¼???ºÃ
+    input wire uart_tbre,            //·¢ËÍÊı??±êÖ¾
+    input wire uart_tsre,            //Êı¾İ·¢ËÍÍê±Ï±ê??
+    inout wire[31:0] base_ram_data,  //BaseRAMÊı¾İ£¬µÍ8Î»ÓëCPLD´®¿Ú¿ØÖÆÆ÷¹²??
+    output wire[19:0] base_ram_addr, //BaseRAMµØÖ·
+    output wire[3:0] base_ram_be_n,  //BaseRAM×Ö½ÚÊ¹ÄÜ£¬µÍÓĞĞ§¡£???¹û²»Ê¹ÓÃ×Ö½ÚÊ¹ÄÜ£¬Çë±£³ÖÎª0
+    output wire base_ram_ce_n,       //BaseRAMÆ¬Ñ¡£¬µÍÓĞ??
+    output wire base_ram_oe_n,       //BaseRAM¶ÁÊ¹ÄÜ£¬µÍÓĞ??
+    output wire base_ram_we_n,       //BaseRAMĞ´Ê¹ÄÜ£¬µÍÓĞ??
+    inout wire[31:0] ext_ram_data,   //ExtRAMÊı¾İ
+    output wire[19:0] ext_ram_addr,  //ExtRAMµØÖ·
+    output wire[3:0] ext_ram_be_n,   //ExtRAM×Ö½ÚÊ¹ÄÜ£¬µÍÓĞĞ§¡£???¹û²»Ê¹ÓÃ×Ö½ÚÊ¹ÄÜ£¬Çë±£³ÖÎª0
+    output wire ext_ram_ce_n,        //ExtRAMÆ¬Ñ¡£¬µÍÓĞ??
+    output wire ext_ram_oe_n,        //ExtRAM¶ÁÊ¹ÄÜ£¬µÍÓĞ??
+    output wire ext_ram_we_n,        //ExtRAMĞ´Ê¹ÄÜ£¬µÍÓĞ??
+    output wire txd,                 //Ö±Á¬´®¿Ú·¢ËÍ???
+    input wire rxd,                  //Ö±Á¬´®¿Ú½ÓÊÕ??
+    output wire [22:0]flash_a,       //FlashµØÖ·£¬a0½öÔÚ8bitÄ£Ê½ÓĞĞ§??16bitÄ£Ê½ÎŞÒâ??
+    inout wire [15:0]flash_d,        //FlashÊı¾İ
+    output wire flash_rp_n,          //Flash¸´Î»ĞÅºÅ£¬µÍÓĞĞ§
+    output wire flash_vpen,          //FlashĞ´±£»¤ĞÅºÅ£¬µÍµçÆ½Ê±²»ÄÜ²Á³ı¡¢ÉÕ??
+    output wire flash_ce_n,          //FlashÆ¬Ñ¡ĞÅºÅ£¬µÍÓĞ??
+    output wire flash_oe_n,          //Flash¶ÁÊ¹ÄÜĞÅºÅ£¬µÍÓĞ??
+    output wire flash_we_n,          //FlashĞ´Ê¹ÄÜĞÅºÅ£¬µÍÓĞ??
+    output wire flash_byte_n,        //Flash 8bitÄ£Ê½Ñ¡Ôñ£¬µÍÓĞĞ§¡£ÔÚÊ¹ÓÃflash??16Î»Ä£Ê½Ê±Çë???Îª1
     output wire sl811_a0,
     output wire sl811_wr_n,
     output wire sl811_rd_n,
@@ -53,22 +53,24 @@ module thinpad_top
     output wire dm9k_cs_n,
     output wire dm9k_pwrst_n,
     input wire dm9k_int,
-    output wire[2:0] video_red,      //çº¢è‰²åƒç´ ï¿½?3ï¿½?
-    output wire[2:0] video_green,    //ç»¿è‰²åƒç´ ï¿½?3ï¿½?
-    output wire[1:0] video_blue,     //è“è‰²åƒç´ ï¿½?2ï¿½?
-    output wire video_hsync,         //è¡ŒåŒæ­¥ï¼ˆæ°´å¹³åŒï¿½?ï¿½ï¼‰ä¿¡å·
-    output wire video_vsync,         //åœºåŒæ­¥ï¼ˆå‚ç›´åŒï¿½?ï¿½ï¼‰ä¿¡å·
-    output wire video_clk,           //åƒç´ æ—¶é’Ÿè¾“å‡º
+    output wire[2:0] video_red,      //ºìÉ«ÏñËØ??3??
+    output wire[2:0] video_green,    //ÂÌÉ«ÏñËØ??3??
+    output wire[1:0] video_blue,     //À¶É«ÏñËØ??2??
+    output wire video_hsync,         //ĞĞÍ¬²½£¨Ë®Æ½Í¬???£©ĞÅºÅ
+    output wire video_vsync,         //³¡Í¬²½£¨´¹Ö±Í¬???£©ĞÅºÅ
+    output wire video_clk,           //ÏñËØÊ±ÖÓÊä³ö
     output wire video_de
-);           //è¡Œæ•°ï¿½?æœ‰æ•ˆä¿¡å·ï¼Œç”¨äºåŒºåˆ†æ¶ˆéšåŒº
+);           //ĞĞÊı??ÓĞĞ§ĞÅºÅ£¬ÓÃÓÚÇø·ÖÏûÒşÇø
 
-    reg[15:0] disp;
-    assign leds = disp; //è®©ledsæ˜¾ç¤ºè°ƒè¯•å†…å®¹
+    assign leds = 16'b0; //ÈÃledsÏÔÊ¾µ÷ÊÔÄÚÈİ
 
     wire clk, rst;
-    assign clk = clk_50M;
-    //assign clk = clock_btn;
-    assign rst = reset_btn;
+    wire clk_10M, clk_15M, clk_20M, clk_25M;
+    wire rst_10M, rst_15M, rst_20M, rst_25M;
+
+    // NOTE: Ñ¡ÔñÊ±ÖÓÀ´Ô´
+    assign clk = clk_25M;
+    assign rst = rst_25M;
 
     // stages
     reg  [2:0] stage;
@@ -88,7 +90,7 @@ module thinpad_top
     wire pcWr, pcNowWr, pcSel;
     wire ramSel, ramWr, ramRd, ramDone;  // ramSel: address (aluout reg or pc)
     wire instructionWr;
-    wire aluFlagZero;
+    wire aluFlagZero, aluRorI;
 
     wire [1:0] aluASel, aluBSel, regDSel;  // ALU opr A, ALU opr B, register data
     wire [1:0] ramByte;  // number of bytes for ram to read
@@ -107,6 +109,45 @@ module thinpad_top
     reg  [31:0] regInstruction, regRam;
     reg  [31:0] data2RF, oprandA, oprandB;
 
+    // NOTE: ¿ØÖÆÆ÷ Controller
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            regA           <= 32'b0;
+            regB           <= 32'b0;
+            regC           <= 32'b0;
+            regRam         <= 32'b0;
+            pc             <= 32'h8000_0000;
+            pcNow          <= 32'b0;
+            regInstruction <= 32'b0;
+            stage          <= IDLE;
+        end
+        else begin
+            regA   <= rs1Data;
+            regB   <= rs2Data;
+            regC   <= aluRes;
+            regRam <= ramDataOut;
+
+            if ((stage == IF) || (stage == MEM)) begin
+                if(ramDone) begin
+                    stage <= stageNext;
+                end
+            end
+            else begin
+                stage <= stageNext;
+            end
+
+            if (pcWr && !(stage == IF && ~ramDone))
+                pc <= pcSrc;
+
+            if (pcNowWr)
+                pcNow <= pc;
+
+            if (instructionWr)
+                regInstruction <= ramDataOut;
+        end
+    end
+
+    // NOTE: MUX
     assign rs1 = regInstruction[19:15];
     assign rs2 = regInstruction[24:20];
     assign rd  = regInstruction[11:07];
@@ -114,13 +155,12 @@ module thinpad_top
     assign pcSrc   = pcSel ? aluRes : regC;
     assign ramAddr = ramSel ? regC : pc;
 
-
     always @(*) begin
         case (regDSel)
             2'b00 : data2RF = regRam;
             2'b01 : data2RF = regC;
             2'b10 : data2RF = pc;
-            2'b11 : data2RF = immOut; //ä¸ºäº†LUIæŒ‡ä»¤ï¼ŒæŠŠ11è®¾ç½®æˆäº†é€‰æ‹©ç«‹å³æ•°ç”Ÿæˆå™¨ç”Ÿæˆçš„å·¦ç§»12ä½åçš„æ•°æ®
+            2'b11 : data2RF = immOut; //ÎªÁËLUIÖ¸Áî£¬°Ñ11ÉèÖÃ³ÉÁËÑ¡ÔñÁ¢¼´ÊıÉú³ÉÆ÷Éú³ÉµÄ×óÒÆ12Î»ºóµÄÊı¾İ
         endcase
 
         case (aluASel)
@@ -138,6 +178,7 @@ module thinpad_top
         endcase
     end
 
+    // NOTE: ×é¼şÀı»¯
     RegFile regFile(
         .clk(clk),
         .rst(rst),
@@ -177,6 +218,7 @@ module thinpad_top
         .regWr(regWr),
         .aluASel(aluASel),
         .aluBSel(aluBSel),
+        .aluRI(aluRorI),
         .func3(aluFunc3),
         .func7(aluFunc7),
 
@@ -184,6 +226,7 @@ module thinpad_top
     );
 
     ALU alu(
+        .ri(aluRorI),
         .funct3(aluFunc3),
         .funct7(aluFunc7),
         .oprandA(oprandA),
@@ -227,73 +270,17 @@ module thinpad_top
         .uartWrN(uart_wrn)
     );
 
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            disp           <= disp;
-            regA           <= 32'b0;
-            regB           <= 32'b0;
-            regC           <= 32'b0;
-            regRam         <= 32'b0;
-            pc             <= 32'b0;
-            pcNow          <= 32'b0;
-            regInstruction <= 32'b0;
-            stage          <= IDLE;
-        end
-        else begin
-            disp   <= disp;
-            regA   <= rs1Data;
-            regB   <= rs2Data;
-            regC   <= aluRes;
-            regRam <= ramDataOut;
-
-            if ((stage == IF) || (stage == MEM)) begin
-                if(ramDone) begin
-                    stage <= stageNext;
-                end
-            end
-            else begin
-                stage <= stageNext;
-            end
-
-
-            if (pcWr) pc <= pcSrc;
-
-            if (pcNowWr) pcNow <= pc;
-
-            if (instructionWr) regInstruction <= ramDataOut;
-        end
-    end
-    /* ==  ==  ==  ==  ==  = Demo code begin ==  ==  ==  ==  ==  = */
-
-    // // PLLåˆ†ï¿½?ï¿½ç¤ºï¿½?
-    // wire locked, clk_10M, clk_20M;
-    // pll_example clock_gen
-    // (
-    // // Clock in ports
-    // .clk_in1(clk_50M),  // å¤–éƒ¨æ—¶é’Ÿè¾“å…¥
-    // // Clock out ports
-    // .clk_out1(clk_10M), // æ—¶é’Ÿè¾“å‡º1ï¼Œï¿½?ï¿½ç‡åœ¨IPé…ç½®ç•Œé¢ï¿½?è®¾ç½®
-    // .clk_out2(clk_20M), // æ—¶é’Ÿè¾“å‡º2ï¼Œï¿½?ï¿½ç‡åœ¨IPé…ç½®ç•Œé¢ï¿½?è®¾ç½®
-    // // Status and control signals
-    // .reset(reset_btn), // PLLå¤ä½è¾“å…¥
-    // .locked(locked)    // PLLé”å®šæŒ‡ç¤ºè¾“å‡ºï¿½?"1"è¡¨ç¤ºæ—¶é’Ÿç¨³å®šï¿½?
-    // // åçº§ç”µè·¯å¤ä½ä¿¡å·åº”å½“ç”±å®ƒç”Ÿæˆï¼ˆï¿½?ï¿½ä¸‹ï¿½?
-    // );
-
-    // reg reset_of_clk10M;
-    // // å¼‚ï¿½?ï¿½ï¿½?ï¿½ä½ï¼ŒåŒæ­¥é‡Šæ”¾ï¼Œå°†lockedä¿¡å·ï¿½?ä¸ºåçº§ç”µï¿½?çš„ï¿½?ï¿½ä½reset_of_clk10M
-    // always@(posedge clk_10M or negedge locked) begin
-    //     if (~locked) reset_of_clk10M <= 1'b1;
-    //     else        reset_of_clk10M  <= 1'b0;
-    // end
-
-    // always@(posedge clk_10M or posedge reset_of_clk10M) begin
-    //     if (reset_of_clk10M)begin
-    //         // Your Code
-    //     end
-    //     else begin
-    //         // Your Code
-    //     end
-    // end
+    ClkGen clkgen(
+        clk_50M,
+        reset_btn,
+        clk_10M,
+        clk_15M,
+        clk_20M,
+        clk_25M,
+        rst_10M,
+        rst_15M,
+        rst_20M,
+        rst_25M
+    );
 
 endmodule
