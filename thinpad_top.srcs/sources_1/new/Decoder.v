@@ -48,8 +48,8 @@ module Decoder(
     output reg          aluRI,
     //下列全部是ExcepHandler的输入项
     output reg          exceptFlag,
+    output reg          retFlag,
     output reg [31:0]   mcauseIn, //根据异常原因给出
-    output reg          csrRd,//读使能
     output reg [1:0]    csrWrOp,//写入选项
 
     output reg [2:0]    stageNext
