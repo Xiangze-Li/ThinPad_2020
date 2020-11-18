@@ -133,6 +133,7 @@ module thinpad_top
             pc             <= 32'h8000_0000;
             pcNow          <= 32'b0;
             regInstruction <= 32'b0;
+            mcauseReg      <= 32'hFFFFFFFF;
             stage          <= IDLE;
         end
         else begin
@@ -159,7 +160,7 @@ module thinpad_top
             if (instructionWr)
                 regInstruction <= ramDataOut;
 
-            if (exceptionFlag)
+            // if (exceptionFlag)
                 mcauseReg <= decodeMcause;
         end
     end
