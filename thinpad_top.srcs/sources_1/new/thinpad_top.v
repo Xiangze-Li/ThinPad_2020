@@ -98,9 +98,10 @@ module thinpad_top
     wire cpuMode;
     wire [1:0] csrWrOp;
     wire [11:0] csrAddr;
-    wire [31:0] mcause;
+    wire [31:0] decodeMcause;
     wire [31:0] csrDataOut;
     wire [31:0] excepHandleAddr, epcOut;
+    reg  [31:0] mcauseReg;
 
 
     wire [1:0] aluASel, aluBSel;  // ALU opr A, ALU opr B
@@ -157,6 +158,9 @@ module thinpad_top
 
             if (instructionWr)
                 regInstruction <= ramDataOut;
+
+            if (exceptionFlag)
+                mcauseReg <= decodeMcause;
         end
     end
 
@@ -222,7 +226,7 @@ module thinpad_top
 
         .excepFlag(exceptionFlag),
         .retFlag(excepRetFlag),
-        .mcauseIn(mcause),
+        .mcauseIn(mcauseReg),
         .pcNowIn(pcNow),
 
         .csrWrOp(csrWrOp),
@@ -270,7 +274,7 @@ module thinpad_top
 
         .exceptFlag(exceptionFlag),
         .retFlag(excepRetFlag),
-        .mcauseIn(mcause),
+        .mcauseIn(decodeMcause),
         .csrWrOp(csrWrOp),
 
         .stageNext(stageNext)
