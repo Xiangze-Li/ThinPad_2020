@@ -48,12 +48,13 @@ module ExcepHandler
 
     assign handlerAddr = (CSRs[1][1:0] == 2'b00 ? CSRs[1] : vectorAddr);
     assign epcOut = CSRs[3];
-    assign csrDataOut = csrRd ? CSRs[trueAddr] : 32'b0;
+    assign csrDataOut = CSRs[trueAddr];
 
     parameter [1:0]
         MODE_U = 2'b00,
         MODE_M = 2'b11;
-    reg [1:0] mode;
+    reg [1:0] mode_R;
+    assign mode = (mode_R == 2'b11);
 
     integer i;
     always @(posedge clk, posedge rst) begin
@@ -61,16 +62,16 @@ module ExcepHandler
             for (i=0; i<CSR_SIZE; i=i+1) begin
                 CSRs[i] <= 32'b0;
             end
-            mode <= MODE_M;
+            mode_R <= MODE_M;
         end
         else if (excepFlag) begin
             CSRs[4]         <= mcauseIn;
             CSRs[3]         <= pcNowIn;
             CSRs[0][12:11]  <= 2'b00;
-            mode            <= MODE_M;
+            mode_R          <= MODE_M;
         end
         else if (retFlag) begin
-            mode            <= MODE_U;
+            mode_R          <= MODE_U;
         end
         else begin
             case (csrWrOp)

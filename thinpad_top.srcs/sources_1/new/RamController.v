@@ -170,6 +170,7 @@ module RamController
             uartWrN_R <= 1'b1;
             uartRdN_R <= 1'b1;
             outData   <= 32'b0;
+            addrFault <= 1'b0;
         end
         else begin
             case (state)
