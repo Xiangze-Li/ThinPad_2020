@@ -562,9 +562,9 @@ module Decoder(
                                 ramRd       <= 1'b0;
                                 ramByte     <= 2'b11;
                                 irWr        <= 1'b0;
-                                regDSel     <= 3'b001; //rd<-Cďż?? pc + immďż??
+                                regDSel     <= 3'b100; //rd<-Cďż?? pc + immďż??
                                 immSel      <= IMM_N;
-                                regWr       <= 1'b0; //mret ä¸ç¨ĺĺŻĺ­ĺ¨
+                                regWr       <= 1'b1; //mret ä¸ç¨ĺĺŻĺ­ĺ¨
                                 aluASel     <= 2'b11;
                                 aluBSel     <= 2'b11;
                                 aluRI       <= 1'b0;
@@ -644,53 +644,6 @@ module Decoder(
         endcase
     end
 
-    /*always @(*) begin
-    // Next Stage Gen.
-        case (stage)
-            IDLE :
-                stageNext = IF;
-            IF :
-                stageNext = ID;
-            ID  :
-                case (opCode)
-                    OP_R        : stageNext = EXE;
-                    OP_I        : stageNext = EXE;
-                    OP_L        : stageNext = EXE;
-                    OP_S        : stageNext = EXE;
-                    OP_B        : stageNext = EXE;
-                    OP_JAL      : stageNext = EXE;
-                    OP_JALR     : stageNext = EXE;
-                    OP_LUI      : stageNext = WB;
-                    OP_AUIPC    : stageNext = EXE;
-                    default     : stageNext = ERR;
-                endcase
-            EXE : begin
-                case (opCode)
-                    OP_R        : stageNext = WB;
-                    OP_I        : stageNext = WB;
-                    OP_L        : stageNext = MEM;
-                    OP_S        : stageNext = MEM;
-                    OP_B        : stageNext = IF;
-                    OP_JAL      : stageNext = IF;
-                    OP_JALR     : stageNext = WB;
-                    OP_AUIPC    : stageNext = WB;
-                    default     : stageNext = ERR;
-                endcase
-            end
-            MEM : begin
-                case (opCode)
-                    OP_L : stageNext = WB;
-                    OP_S : stageNext = IF;
-                    default: stageNext = ERR;
-                endcase
-            end
-            WB :
-                stageNext = IF;
-            default:
-                stageNext = ERR;
-        endcase
-    end*/
-
     always @(*) begin
     // Next Stage Gen.
     mcauseIn = 32'hffffffff;
@@ -719,16 +672,25 @@ module Decoder(
                         case (funct3)
                             3'b000 :
                                 case (funct12)
-                                    12'b000000000000 : begin stageNext = EXC; mcauseIn = 32'h00000008;end //environment call from U-mode
-                                    12'b000000000001 : begin stageNext = EXC; mcauseIn = 32'h00000003;end //breakpoint
-                                    12'b001100000010 : stageNext = WB; //mret
-                                    default: stageNext = ERR; //ĺśäťćĺľĺä¸şć?Žäšćďż??
+                                    12'b000000000000 : begin
+                                        stageNext = EXC;
+                                        mcauseIn = 32'h00000008;
+                                    end //environment call from U-mode
+                                    12'b000000000001 : begin
+                                        stageNext = EXC;
+                                        mcauseIn = 32'h00000003;
+                                    end //breakpoint
+                                    12'b001100000010 :
+                                        stageNext = WB; //mret
+                                    default:
+                                        stageNext = ERR;
                                 endcase
                             default: stageNext = WB; //csrćäť¤
                         endcase
-                    //OP_ECALL    : stageNext = EXC; mcauseIn = 32'h00000008; //environment call from U-mode
-                    //OP_EBREAK   : stageNext = EXC; mcauseIn = 32'h00000003; //breakpoint
-                    default     : begin stageNext = EXC; mcauseIn = 32'h00000002;end //illegal instruction
+                    default     : begin
+                        stageNext = EXC;
+                        mcauseIn = 32'h00000002;
+                    end //illegal instruction
                 endcase
             EXE : begin
                 case (opCode)
