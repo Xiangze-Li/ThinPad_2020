@@ -1,22 +1,22 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date: 2020/11/08 14:33:20
-// Design Name: 
+// Design Name:
 // Module Name: Decoder
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -24,9 +24,9 @@ module Decoder(
     input wire [31:0]   inst,
     input wire          flagZ,
     input wire [2:0]    stage,
-    //ExceptionHandler鐨勮緭鍑洪」
-    input wire          mode, //鐢ㄦ潵鏍囪?褰撳墠鏈哄櫒鎬侊紵
-    //ramController浼犳潵鐨勫叧浜庡湴锟??閿欒?鐨勪俊锟??
+    //ExceptionHandler莽職聞膷啪聯暮聡艧茅膭拧
+    input wire          mode,
+    //ramController盲藕聽膰聺慕莽職聞暮聟艂盲艧聨暮聹掳膹偶??茅聰聶膷?莽職聞盲偶膭膹偶??
     input wire          addrMisal,
     input wire          addrFault,
 
@@ -46,11 +46,11 @@ module Decoder(
     output reg [2:0]    func3,
     output reg [6:0]    func7,
     output reg          aluRI,
-    //涓嬪垪鍏ㄩ儴鏄疎xcepHandler鐨勮緭鍏ラ」
+    //盲赂聥暮聢聴暮聟篓茅聝篓膰聵呕ExcepHandler莽職聞膷啪聯暮聟慕茅膭拧
     output reg          exceptFlag,
     output reg          retFlag,
-    output reg [31:0]   mcauseIn, //鏍规嵁寮傚父鍘熷洜缁欏嚭
-    output reg [1:0]    csrWrOp,//鍐欏叆閫夐」
+    output reg [31:0]   mcauseIn, //膰聽拧膰聧沤暮藕聜暮赂赂暮聨聼暮聸聽莽钮聶暮聡艧
+    output reg [1:0]    csrWrOp,//暮聠聶暮聟慕茅聙聣茅膭拧
 
     output reg [2:0]    stageNext
     );
@@ -63,9 +63,9 @@ module Decoder(
         EXE = 3'b011,
         MEM = 3'b100,
         WB  = 3'b101,
-        EXC = 3'b110, //exception 寮傚父澶勭悊鐘讹拷??
+        EXC = 3'b110, //exception 暮藕聜暮赂赂暮陇聞莽聬聠莽聤艣膹偶藵??
         ERR = 3'b111;
-    
+
     parameter [6:0]
     // OpCode
         OP_R        = 7'b0110011,
@@ -78,13 +78,13 @@ module Decoder(
         OP_JAL      = 7'b1101111,
         OP_AUIPC    = 7'b0010111,
         OP_LUI      = 7'b0110111,
-        //寮傚父涓?柇鎸囦护
+        //暮藕聜暮赂赂盲赂?聳颅膰聦聡盲钮陇
         OP_SYS      = 7'b1110011;
 
     wire [6:0]  opCode, funct7;
     wire [2:0]  funct3;
     wire [11:0] funct12;
-    
+
 
     assign opCode = inst[6:0];
     assign funct3 = inst[14:12];
@@ -102,7 +102,7 @@ module Decoder(
 
     always @(*) begin
         case (stage)
-        // 姣忎釜闃舵?涓哄綋鍓嶉樁娈靛噯澶囨帶鍒朵俊锟??!
+        // 膰呕聫盲赂艦茅聵艣膰?盲赂艧暮藵聯暮聣聧茅聵艣膰沤木暮聡聠暮陇聡膰聨搂暮聢艣盲偶膭膹偶??!
             IF : begin
                 pcWr        <= 1'b1;
                 pcNowWr     <= 1'b1;
@@ -110,7 +110,7 @@ module Decoder(
                 ramSel      <= 1'b0;
                 ramWr       <= 1'b0;
                 ramRd       <= 1'b1;
-                ramByte     <= 2'b10; //IF闃舵?鎸夊瓧璇诲彇鎸囦护
+                ramByte     <= 2'b10; //IF茅聵艣膰?膰聦聣暮颅聴膷呕钮暮聫聳膰聦聡盲钮陇
                 irWr        <= 1'b1;
                 regDSel     <= 3'b011;
                 immSel      <= IMM_N;
@@ -120,9 +120,9 @@ module Decoder(
                 aluRI       <= 1'b0;
                 func3       <= 3'b000;
                 func7       <= 7'b0000000;
-                exceptFlag  <= 1'b0;//异常使能关闭
-                retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                csrWrOp     <= 2'b00;//不需要写csr
+                exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
             end
             ID : begin
                 pcWr        <= 1'b0;
@@ -131,19 +131,19 @@ module Decoder(
                 ramSel      <= 1'b0;
                 ramWr       <= 1'b0;
                 ramRd       <= 1'b0;
-                ramByte     <= 2'b10; //ID闃舵?涓嶈?锟??
+                ramByte     <= 2'b10; //ID茅聵艣膰?盲赂聧膷?膹偶??
                 irWr        <= 1'b0;
                 regDSel     <= 3'b011;
-                immSel      <= IMM_N; //涓哄暐閫変簡涓狟锟??
+                immSel      <= IMM_N; //盲赂艧暮聲慕茅聙聣盲艧聠盲赂艦B膹偶??
                 regWr       <= 1'b0;
                 aluASel     <= 2'b01;
                 aluBSel     <= 2'b10;
                 aluRI       <= 1'b0;
                 func3       <= 3'b000;
                 func7       <= 7'b0000000;
-                exceptFlag  <= 1'b0;//异常使能关闭
-                retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                csrWrOp     <= 2'b00;//不需要写csr
+                exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
             end
             EXE : begin
                 case (opCode)
@@ -164,9 +164,9 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= funct3;
                         func7       <= funct7;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_I : begin
                         pcWr        <= 1'b0;
@@ -185,9 +185,9 @@ module Decoder(
                         aluRI       <= 1'b1;
                         func3       <= funct3;
                         func7       <= funct7;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_L : begin
                         pcWr        <= 1'b0;
@@ -206,9 +206,9 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_S : begin
                         pcWr        <= 1'b0;
@@ -227,12 +227,12 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_B : begin
-                        pcWr        <= (funct3 == 3'b000)? flagZ : ((funct3 == 3'b001)? ~flagZ : 1'b0); //beq鍒欑粨鏋滀负0鏃舵敼鍐欙紝bne鍒欑粨鏋滀笉锟??0鏃舵敼锟??
+                        pcWr        <= (funct3 == 3'b000)? flagZ : ((funct3 == 3'b001)? ~flagZ : 1'b0); //beq暮聢聶莽钮聯膰聻聹盲赂艧0膰聴艣膰聰拧暮聠聶膹藕聦bne暮聢聶莽钮聯膰聻聹盲赂聧膹偶??0膰聴艣膰聰拧膹偶??
                         pcNowWr     <= 1'b0;
                         pcSel       <= 2'b00;
                         ramSel      <= 1'b0;
@@ -247,21 +247,21 @@ module Decoder(
                         aluBSel     <= 2'b01;
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
-                        func7       <= 7'b0100000; //branch鎸囦护锟??瑕佸皢涓や釜鏁扮浉鍑忓垽鏂?粨鏋滄槸鍚︿负0
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        func7       <= 7'b0100000; //branch膰聦聡盲钮陇膹偶??膷艢聛暮掳聠盲赂陇盲赂艦膰聲掳莽聸赂暮聡聫暮聢陇膰聳?钮聯膰聻聹膰聵呕暮聬艢盲赂艧0
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
-                    OP_JAL : begin //JAL鎸夌収ppt鐨勬灦鏋勯渶瑕佸湪EXE鍛ㄦ湡鍚屾椂鍐欏叆瀵勫瓨鍣ㄥ拰pc
-                        pcWr        <= 1'b1; //鍐橮C
+                    OP_JAL : begin //JAL膰聦聣莽聟搂ppt莽職聞膰聻艣膰聻聞茅聹聙膷艢聛暮聹篓EXE暮聭篓膰聹聼暮聬聦膰聴艣暮聠聶暮聟慕暮呕聞暮颅聵暮聶篓暮聮聦pc
+                        pcWr        <= 1'b1; //暮聠聶PC
                         pcNowWr     <= 1'b0;
-                        pcSel       <= 2'b01; //閫夋嫨ALU鐨勮繍绠楃粨锟??
+                        pcSel       <= 2'b01; //茅聙聣膰聥艩ALU莽職聞膷偶聬莽沤聴莽钮聯膹偶??
                         ramSel      <= 1'b0;
                         ramWr       <= 1'b0;
                         ramRd       <= 1'b0;
                         ramByte     <= func3[1:0];
                         irWr        <= 1'b0;
-                        regDSel     <= 3'b010; //JAL瑕佸皢pc+4鍐欏叆rd
+                        regDSel     <= 3'b010; //JAL膷艢聛暮掳聠pc+4暮聠聶暮聟慕rd
                         immSel      <= IMM_J;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b00; //PC
@@ -269,12 +269,12 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
-                    OP_JALR : begin //JALR EXE鍛ㄦ湡鍙?仛ALU杩愮畻
-                        pcWr        <= 1'b0; 
+                    OP_JALR : begin //JALR EXE暮聭篓膰聹聼暮聫?聛職ALU膷偶聬莽沤聴
+                        pcWr        <= 1'b0;
                         pcNowWr     <= 1'b0;
                         pcSel       <= 2'b00;
                         ramSel      <= 1'b0;
@@ -290,11 +290,11 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
-                    //LUI鐩存帴杩涘叆WB鍛ㄦ湡
+                    //LUI莽聸麓膰聨慕膷偶聸暮聟慕WB暮聭篓膰聹聼
                     /*OP_LUI : begin
                         pcWr        <= 1'b0;
                         pcNowWr     <= 1'b0;
@@ -307,12 +307,12 @@ module Decoder(
                         regDSel     <= 2'b11;
                         immSel      <= IMM_U;
                         regWr       <= 1'b0;
-                        aluASel     <= 2'b11; //涓嶏拷?锟芥嫨
+                        aluASel     <= 2'b11; //盲赂聧膹偶藵?膹偶藵膰聥艩
                         aluBSel     <= 2'b10; //imm
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
                     end*/
-                    OP_AUIPC : begin //AUIPC EXE鍛ㄦ湡璁＄畻pc+imm
+                    OP_AUIPC : begin //AUIPC EXE暮聭篓膰聹聼膷沤膭莽沤聴pc+imm
                         pcWr        <= 1'b0;
                         pcNowWr     <= 1'b0;
                         pcSel       <= 2'b00;
@@ -324,14 +324,14 @@ module Decoder(
                         regDSel     <= 3'b011;
                         immSel      <= IMM_U;
                         regWr       <= 1'b0;
-                        aluASel     <= 2'b01; //閫夋嫨pc_now
+                        aluASel     <= 2'b01; //茅聙聣膰聥艩pc_now
                         aluBSel     <= 2'b10; //imm
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     default : begin
                         pcWr        <= 1'b0;
@@ -350,9 +350,9 @@ module Decoder(
                         aluRI       <= 1'bX;
                         func3       <= 3'bXXX;
                         func7       <= 7'bXXXXXXX;
-                        exceptFlag  <= 1'bX;//异常使能关闭
-                        retFlag     <= 1'bX;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'bXX;//不需要写csr
+                        exceptFlag  <= 1'bX;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'bX;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'bXX;//藳钮膼膷艊艦膼麓csr
                     end
                 endcase
             end
@@ -375,9 +375,9 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_L : begin
                         pcWr        <= 1'b0;
@@ -396,9 +396,9 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     default : begin
                         pcWr        <= 1'b0;
@@ -417,15 +417,15 @@ module Decoder(
                         aluRI       <= 1'bX;
                         func3       <= 3'bXXX;
                         func7       <= 7'bXXXXXXX;
-                        exceptFlag  <= 1'bX;//异常使能关闭
-                        retFlag     <= 1'bX;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'bXX;//不需要写csr
+                        exceptFlag  <= 1'bX;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'bX;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'bXX;//藳钮膼膷艊艦膼麓csr
                     end
                 endcase
             end
             WB : begin
                 case (opCode)
-                    OP_I, OP_R : begin //OP_I, OP_R 灏唕egC鍐欏洖rd
+                    OP_I, OP_R : begin //OP_I, OP_R 暮掳聠regC暮聠聶暮聸聻rd
                         pcWr        <= 1'b0;
                         pcNowWr     <= 1'b0;
                         pcSel       <= 2'b01;
@@ -434,7 +434,7 @@ module Decoder(
                         ramRd       <= 1'b0;
                         ramByte     <= func3[1:0];
                         irWr        <= 1'b0;
-                        regDSel     <= 3'b001; //閫夋嫨regC鍐欏洖rd
+                        regDSel     <= 3'b001; //茅聙聣膰聥艩regC暮聠聶暮聸聻rd
                         immSel      <= IMM_N;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
@@ -442,11 +442,11 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
-                    OP_L : begin //OP_L绫诲瀷灏咲R鍐欏洖rd
+                    OP_L : begin //OP_L莽膮钮暮聻聥暮掳聠DR暮聠聶暮聸聻rd
                         pcWr        <= 1'b0;
                         pcNowWr     <= 1'b0;
                         pcSel       <= 2'b01;
@@ -455,7 +455,7 @@ module Decoder(
                         ramRd       <= 1'b0;
                         ramByte     <= func3[1:0];
                         irWr        <= 1'b0;
-                        regDSel     <= 3'b000; //鍐欏洖ram涓?殑鏁版嵁
+                        regDSel     <= 3'b000; //暮聠聶暮聸聻ram盲赂?職聞膰聲掳膰聧沤
                         immSel      <= IMM_N;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
@@ -463,9 +463,9 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_JALR : begin //JALR PC<-C rd<-PC
                         pcWr        <= 1'b1;
@@ -476,7 +476,7 @@ module Decoder(
                         ramRd       <= 1'b0;
                         ramByte     <= func3[1:0];
                         irWr        <= 1'b0;
-                        regDSel     <= 3'b010; //鍐欏洖pc+4
+                        regDSel     <= 3'b010; //暮聠聶暮聸聻pc+4
                         immSel      <= IMM_N;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
@@ -484,9 +484,9 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_LUI : begin //LUI rd<-imm
                         pcWr        <= 1'b0;
@@ -505,9 +505,9 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_AUIPC : begin //AUIPC rd<-C
                         pcWr        <= 1'b0;
@@ -518,7 +518,7 @@ module Decoder(
                         ramRd       <= 1'b0;
                         ramByte     <= func3[1:0];
                         irWr        <= 1'b0;
-                        regDSel     <= 3'b001; //rd<-C锟?? pc + imm锟??
+                        regDSel     <= 3'b001; //rd<-C膹偶?? pc + imm膹偶??
                         immSel      <= IMM_N;
                         regWr       <= 1'b1;
                         aluASel     <= 2'b11;
@@ -526,13 +526,13 @@ module Decoder(
                         aluRI       <= 1'b0;
                         func3       <= 3'b000;
                         func7       <= 7'b0000000;
-                        exceptFlag  <= 1'b0;//异常使能关闭
-                        retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'b00;//不需要写csr
+                        exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                     end
                     OP_SYS : begin
                         case (funct3)
-                            3'b000 : begin//mret鎸囦护
+                            3'b000 : begin//mret膰聦聡盲钮陇
                                 pcWr        <= 1'b1;
                                 pcNowWr     <= 1'b0;
                                 pcSel       <= 2'b11;
@@ -541,19 +541,19 @@ module Decoder(
                                 ramRd       <= 1'b0;
                                 ramByte     <= func3[1:0];
                                 irWr        <= 1'b0;
-                                regDSel     <= 3'b001; //rd<-C锟?? pc + imm锟??
+                                regDSel     <= 3'b001; //rd<-C膹偶?? pc + imm膹偶??
                                 immSel      <= IMM_N;
-                                regWr       <= 1'b0; //mret 无需写寄存器
+                                regWr       <= 1'b0; //mret 脦泞膼膷膼麓藕脛麓膰膯梅
                                 aluASel     <= 2'b11;
                                 aluBSel     <= 2'b11;
                                 aluRI       <= 1'b0;
                                 func3       <= 3'b000;
                                 func7       <= 7'b0000000;
-                                exceptFlag  <= 1'b0;//异常使能关闭
-                                retFlag     <= 1'b1;//mret拉高返回信号
-                                csrWrOp     <= 2'b00;//不需要写csr
+                                exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                                retFlag     <= 1'b1;//mret艛颅赂脽藝木钮艠膼墓艧墓
+                                csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
                             end
-                            default: begin //csr系列指令
+                            default: begin //csr膸木脕膼脰赂脕卯
                                 pcWr        <= 1'b0;
                                 pcNowWr     <= 1'b0;
                                 pcSel       <= 2'b01;
@@ -562,18 +562,18 @@ module Decoder(
                                 ramRd       <= 1'b0;
                                 ramByte     <= func3[1:0];
                                 irWr        <= 1'b0;
-                                regDSel     <= 3'b001; //rd<-C锟?? pc + imm锟??
+                                regDSel     <= 3'b001; //rd<-C膹偶?? pc + imm膹偶??
                                 immSel      <= IMM_N;
-                                regWr       <= 1'b0; //mret 涓嶇敤鍐欏瘎瀛樺櫒
+                                regWr       <= 1'b0; //mret 盲赂聧莽聰篓暮聠聶暮呕聞暮颅聵暮聶篓
                                 aluASel     <= 2'b11;
                                 aluBSel     <= 2'b11;
                                 aluRI       <= 1'b0;
                                 func3       <= 3'b000;
                                 func7       <= 7'b0000000;
-                                exceptFlag  <= 1'b0;//异常使能关闭
-                                retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                                csrWrOp     <= funct3[1:0];//写csr给funct3低两位
-                            end 
+                                exceptFlag  <= 1'b0;//艊臎艂艁臉拧脛脺拧艠膮艕
+                                retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                                csrWrOp     <= funct3[1:0];//膼麓csr赂艡funct3木脥脕藵脦钮
+                            end
                         endcase
                     end
                     default : begin
@@ -593,32 +593,32 @@ module Decoder(
                         aluRI       <= 1'bX;
                         func3       <= 3'bXXX;
                         func7       <= 7'bXXXXXXX;
-                        exceptFlag  <= 1'bX;//异常使能关闭
-                        retFlag     <= 1'bX;//异常返回使能只在mret时为1
-                        csrWrOp     <= 2'bXX;//不需要写csr
+                        exceptFlag  <= 1'bX;//艊臎艂艁臉拧脛脺拧艠膮艕
+                        retFlag     <= 1'bX;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                        csrWrOp     <= 2'bXX;//藳钮膼膷艊艦膼麓csr
                     end
                 endcase
             end
-            EXC : begin //所有异常中断状态
-                pcWr        <= 1'b1; //修改pc到mtevc
-                pcNowWr     <= 1'b0; //pcNow不变
-                pcSel       <= 2'b10;//选择exceptionHandler
+            EXC : begin //脣暖脫膼艊臎艂艁脰膼艣膸脳麓臍殴
+                pcWr        <= 1'b1; //膼泞赂脛pc木藵mtevc
+                pcNowWr     <= 1'b0; //pcNow藳钮膮盲
+                pcSel       <= 2'b10;//艃膭脭艅exceptionHandler
                 ramSel      <= 1'b0;
                 ramWr       <= 1'b0;
                 ramRd       <= 1'b0;
-                ramByte     <= func3[1:0];//无需读写内存
+                ramByte     <= func3[1:0];//脦泞膼膷艣脕膼麓脛脷麓膰
                 irWr        <= 1'b0;
-                regDSel     <= 3'b001; //无需读写寄存器
+                regDSel     <= 3'b001; //脦泞膼膷艣脕膼麓藕脛麓膰膯梅
                 immSel      <= IMM_N;
-                regWr       <= 1'b0; //无需读写寄存器
+                regWr       <= 1'b0; //脦泞膼膷艣脕膼麓藕脛麓膰膯梅
                 aluASel     <= 2'b11;
                 aluBSel     <= 2'b11;
                 aluRI       <= 1'b0;
                 func3       <= 3'b000;
                 func7       <= 7'b0000000;
-                exceptFlag  <= 1'b1;//异常使能
-                retFlag     <= 1'b0;//异常返回使能只在mret时为1
-                csrWrOp     <= 2'b00;//不需要写csr
+                exceptFlag  <= 1'b1;//艊臎艂艁臉拧脛脺
+                retFlag     <= 1'b0;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                csrWrOp     <= 2'b00;//藳钮膼膷艊艦膼麓csr
             end
             default : begin
                 pcWr        <= 1'b0;
@@ -637,9 +637,9 @@ module Decoder(
                 aluRI       <= 1'bX;
                 func3       <= 3'bXXX;
                 func7       <= 7'bXXXXXXX;
-                exceptFlag  <= 1'bX;//异常使能X
-                retFlag     <= 1'bX;//异常返回使能只在mret时为1
-                csrWrOp     <= 2'bXX;//不需要写csr
+                exceptFlag  <= 1'bX;//艊臎艂艁臉拧脛脺X
+                retFlag     <= 1'bX;//艊臎艂艁藝木钮艠臉拧脛脺脰钮脭脷mret臉膮脦艦1
+                csrWrOp     <= 2'bXX;//藳钮膼膷艊艦膼麓csr
             end
         endcase
     end
@@ -680,7 +680,7 @@ module Decoder(
             MEM : begin
                 case (opCode)
                     OP_L : stageNext = WB;
-                    OP_S : stageNext = IF; 
+                    OP_S : stageNext = IF;
                     default: stageNext = ERR;
                 endcase
             end
@@ -703,7 +703,7 @@ module Decoder(
                     2'b01       : begin stageNext = EXC; mcauseIn = 32'h00000000;end //instruction address misaligned
                     2'b10       : begin stageNext = EXC; mcauseIn = 32'h00000001;end //instruction address fault
                     default: stageNext = ERR;
-                endcase 
+                endcase
             ID  :
                 case (opCode)
                     OP_R        : stageNext = EXE;
@@ -715,16 +715,16 @@ module Decoder(
                     OP_JALR     : stageNext = EXE;
                     OP_LUI      : stageNext = WB;
                     OP_AUIPC    : stageNext = EXE;
-                    OP_SYS      : 
+                    OP_SYS      :
                         case (funct3)
-                            3'b000 : 
+                            3'b000 :
                                 case (funct12)
                                     12'b000000000000 : begin stageNext = EXC; mcauseIn = 32'h00000008;end //environment call from U-mode
                                     12'b000000000001 : begin stageNext = EXC; mcauseIn = 32'h00000003;end //breakpoint
                                     12'b001100000010 : stageNext = WB; //mret
-                                    default: stageNext = ERR; //鍏朵粬鎯呭喌鍒欎负鏈?畾涔夋寚锟??
+                                    default: stageNext = ERR; //暮聟艣盲钮聳膰聝聟暮聠木暮聢聶盲赂艧膰聹?沤職盲拧聣膰聦聡膹偶??
                                 endcase
-                            default: stageNext = WB; //csr鎸囦护
+                            default: stageNext = WB; //csr膰聦聡盲钮陇
                         endcase
                     //OP_ECALL    : stageNext = EXC; mcauseIn = 32'h00000008; //environment call from U-mode
                     //OP_EBREAK   : stageNext = EXC; mcauseIn = 32'h00000003; //breakpoint
