@@ -11,22 +11,22 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1133868864fs"></ZoomStartTime>
-      <ZoomEndTime time="1134984865fs"></ZoomEndTime>
-      <Cursor1Time time="1135745531fs"></Cursor1Time>
+      <ZoomStartTime time="69246666fs"></ZoomStartTime>
+      <ZoomEndTime time="71506667fs"></ZoomEndTime>
+      <Cursor1Time time="70970000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="146"></NameColumnWidth>
-      <ValueColumnWidth column_width="327"></ValueColumnWidth>
+      <ValueColumnWidth column_width="323"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="74" />
-   <wvobject fp_name="/tb/clk_11M0592" type="logic">
-      <obj_property name="ElementShortName">clk_11M0592</obj_property>
-      <obj_property name="ObjectShortName">clk_11M0592</obj_property>
+   <WVObjectSize size="76" />
+   <wvobject fp_name="/tb/dut/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb/reset_btn" type="logic">
-      <obj_property name="ElementShortName">reset_btn</obj_property>
-      <obj_property name="ObjectShortName">reset_btn</obj_property>
+   <wvobject fp_name="/tb/dut/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
    <wvobject fp_name="/tb/base_ram_data" type="array">
       <obj_property name="ElementShortName">base_ram_data[31:0]</obj_property>
@@ -131,9 +131,9 @@
       <obj_property name="ElementShortName">pcNowWr</obj_property>
       <obj_property name="ObjectShortName">pcNowWr</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb/dut/pcSel" type="logic">
-      <obj_property name="ElementShortName">pcSel</obj_property>
-      <obj_property name="ObjectShortName">pcSel</obj_property>
+   <wvobject fp_name="/tb/dut/pcSel" type="array">
+      <obj_property name="ElementShortName">pcSel[1:0]</obj_property>
+      <obj_property name="ObjectShortName">pcSel[1:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb/dut/ramSel" type="logic">
       <obj_property name="ElementShortName">ramSel</obj_property>
@@ -168,8 +168,8 @@
       <obj_property name="ObjectShortName">aluBSel[1:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb/dut/regDSel" type="array">
-      <obj_property name="ElementShortName">regDSel[1:0]</obj_property>
-      <obj_property name="ObjectShortName">regDSel[1:0]</obj_property>
+      <obj_property name="ElementShortName">regDSel[2:0]</obj_property>
+      <obj_property name="ObjectShortName">regDSel[2:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb/dut/ramByte" type="array">
       <obj_property name="ElementShortName">ramByte[1:0]</obj_property>
@@ -268,6 +268,14 @@
    <wvobject fp_name="/tb/dut/ramController/ramDone" type="logic">
       <obj_property name="ElementShortName">ramDone</obj_property>
       <obj_property name="ObjectShortName">ramDone</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/dut/ramController/addrMisal" type="logic">
+      <obj_property name="ElementShortName">addrMisal</obj_property>
+      <obj_property name="ObjectShortName">addrMisal</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/dut/ramController/addrFault" type="logic">
+      <obj_property name="ElementShortName">addrFault</obj_property>
+      <obj_property name="ObjectShortName">addrFault</obj_property>
    </wvobject>
    <wvobject fp_name="/tb/dut/ramController/dataIn" type="array">
       <obj_property name="ElementShortName">dataIn[31:0]</obj_property>
