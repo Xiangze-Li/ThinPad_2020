@@ -26,7 +26,7 @@ module RegFile(
             end
         end
         else begin
-            if (regWr && (rd !== 5'b0)) begin
+            if (regWr && (rd != 5'b0)) begin
                 registers[rd] <= inData;
             end
         end
