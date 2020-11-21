@@ -177,7 +177,7 @@ module MMU(
                     end
                 end
                 S_RAM_BEGIN: begin
-                    ramAddr <= mode ? virtualAddr : ramOutReg;
+                    ramAddr <= mode ? virtualAddr : physicalAddr[31:0];
                     ramRd   <= readEn;
                     ramWr   <= writeEn;
                     state   <= S_RAM_DONE;
@@ -196,6 +196,8 @@ module MMU(
                 end
                 S_DONE: begin
                     if (!writeEn && !readEn) begin
+                        ramRd <= 1'b0;
+                        ramWr <= 1'b0;
                         state <= S_IDLE;
                         pageFault <= 1'b0;
                     end
