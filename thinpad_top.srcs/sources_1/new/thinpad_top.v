@@ -2,42 +2,42 @@
 
 module thinpad_top
 (
-    input wire clk_50M,              //50MHz ʱ������
-    input wire clk_11M0592,          //11.0592MHz ʱ�����루???�ã��ɲ���??
-    input wire clock_btn,            //BTN5�ֶ�ʱ�Ӱ�ť���أ���������??������ʱ??1
-    input wire reset_btn,            //BTN6�ֶ���λ��ť���أ���������??������ʱ??1
-    input wire[3:0] touch_btn,       //BTN1~BTN4����??���أ�����ʱΪ1
-    input wire[31:0] dip_sw,         //32λ���뿪�أ�������ON��ʱ??1
-    output wire[15:0] leds,          //16λLED�����ʱ1����
-    output wire[7:0] dpy0,           //����ܵ�λ�źţ�����С���㣬���1����
-    output wire[7:0] dpy1,           //����ܸ�λ�źţ�����С���㣬���1����
-    output wire uart_rdn,            //�������źţ�����??
-    output wire uart_wrn,            //д�����źţ�����??
-    input wire uart_dataready,       //��������׼???��
-    input wire uart_tbre,            //������??��־
-    input wire uart_tsre,            //���ݷ�����ϱ�??
-    inout wire[31:0] base_ram_data,  //BaseRAM���ݣ���8λ��CPLD���ڿ�������??
-    output wire[19:0] base_ram_addr, //BaseRAM��ַ
-    output wire[3:0] base_ram_be_n,  //BaseRAM�ֽ�ʹ�ܣ�����Ч��???����ʹ���ֽ�ʹ�ܣ��뱣��Ϊ0
-    output wire base_ram_ce_n,       //BaseRAMƬѡ������??
-    output wire base_ram_oe_n,       //BaseRAM��ʹ�ܣ�����??
-    output wire base_ram_we_n,       //BaseRAMдʹ�ܣ�����??
-    inout wire[31:0] ext_ram_data,   //ExtRAM����
-    output wire[19:0] ext_ram_addr,  //ExtRAM��ַ
-    output wire[3:0] ext_ram_be_n,   //ExtRAM�ֽ�ʹ�ܣ�����Ч��???����ʹ���ֽ�ʹ�ܣ��뱣��Ϊ0
-    output wire ext_ram_ce_n,        //ExtRAMƬѡ������??
-    output wire ext_ram_oe_n,        //ExtRAM��ʹ�ܣ�����??
-    output wire ext_ram_we_n,        //ExtRAMдʹ�ܣ�����??
-    output wire txd,                 //ֱ�����ڷ���???
-    input wire rxd,                  //ֱ�����ڽ���??
-    output wire [22:0]flash_a,       //Flash��ַ��a0����8bitģʽ��Ч??16bitģʽ����??
-    inout wire [15:0]flash_d,        //Flash����
-    output wire flash_rp_n,          //Flash��λ�źţ�����Ч
-    output wire flash_vpen,          //Flashд�����źţ��͵�ƽʱ���ܲ�������??
-    output wire flash_ce_n,          //FlashƬѡ�źţ�����??
-    output wire flash_oe_n,          //Flash��ʹ���źţ�����??
-    output wire flash_we_n,          //Flashдʹ���źţ�����??
-    output wire flash_byte_n,        //Flash 8bitģʽѡ�񣬵���Ч����ʹ��flash??16λģʽʱ��???Ϊ1
+    input wire clk_50M,
+    input wire clk_11M0592,
+    input wire clock_btn,
+    input wire reset_btn,
+    input wire[3:0] touch_btn,
+    input wire[31:0] dip_sw,
+    output wire[15:0] leds,
+    output wire[7:0] dpy0,
+    output wire[7:0] dpy1,
+    output wire uart_rdn,
+    output wire uart_wrn,
+    input wire uart_dataready,
+    input wire uart_tbre,
+    input wire uart_tsre,
+    inout wire[31:0] base_ram_data,
+    output wire[19:0] base_ram_addr,
+    output wire[3:0] base_ram_be_n,
+    output wire base_ram_ce_n,
+    output wire base_ram_oe_n,
+    output wire base_ram_we_n,
+    inout wire[31:0] ext_ram_data,
+    output wire[19:0] ext_ram_addr,
+    output wire[3:0] ext_ram_be_n,
+    output wire ext_ram_ce_n,
+    output wire ext_ram_oe_n,
+    output wire ext_ram_we_n,
+    output wire txd,
+    input wire rxd,
+    output wire [22:0]flash_a,
+    inout wire [15:0]flash_d,
+    output wire flash_rp_n,
+    output wire flash_vpen,
+    output wire flash_ce_n,
+    output wire flash_oe_n,
+    output wire flash_we_n,
+    output wire flash_byte_n,
     output wire sl811_a0,
     output wire sl811_wr_n,
     output wire sl811_rd_n,
@@ -53,26 +53,26 @@ module thinpad_top
     output wire dm9k_cs_n,
     output wire dm9k_pwrst_n,
     input wire dm9k_int,
-    output wire[2:0] video_red,      //��ɫ����??3??
-    output wire[2:0] video_green,    //��ɫ����??3??
-    output wire[1:0] video_blue,     //��ɫ����??2??
-    output wire video_hsync,         //��ͬ����ˮƽͬ???���ź�
-    output wire video_vsync,         //��ͬ������ֱͬ???���ź�
-    output wire video_clk,           //����ʱ�����
+    output wire[2:0] video_red,
+    output wire[2:0] video_green,
+    output wire[1:0] video_blue,
+    output wire video_hsync,
+    output wire video_vsync,
+    output wire video_clk,
     output wire video_de
-);           //����??��Ч�źţ���������������
+);
 
-    assign leds = 16'b0; //��leds��ʾ��������
+    assign leds = 16'b0;
 
     wire clk, rst;
     wire clk_10M, clk_15M, clk_20M, clk_25M;
     wire rst_10M, rst_15M, rst_20M, rst_25M;
 
-    // NOTE: ѡ��ʱ����Դ
-    assign clk = clk_10M;
-    assign rst = rst_10M;
 
-    // stages
+    assign clk = clk_25M;
+    assign rst = rst_25M;
+
+
     reg  [2:0] stage;
     wire [2:0] stageNext;
     parameter [2:0]
@@ -89,10 +89,10 @@ module thinpad_top
 
     wire regWr;
     wire pcWr, pcNowWr;
-    wire ramSel, ramWr, ramRd, ramDone;  // ramSel: address (aluout reg or pc)
+    wire ramSel, ramWr, ramRd, ramDone;
     wire instructionWr;
     wire aluFlagZero, aluRorI;
-    // exception
+
     wire exceptionFlag, excepRetFlag;
     wire addrMisal, addrFault, pageFault;
     wire cpuMode;
@@ -105,11 +105,11 @@ module thinpad_top
     wire [21:0] ppn;
 
 
-    wire [1:0] aluASel, aluBSel;  // ALU opr A, ALU opr B
+    wire [1:0] aluASel, aluBSel;
     wire [1:0] pcSel;
-    wire [1:0] ramByte;  // number of bytes for ram to read
+    wire [1:0] ramByte;
 
-    wire [2:0] immSel, aluFunc3, regDSel;  //immediate, funct3, register data
+    wire [2:0] immSel, aluFunc3, regDSel;
 
     wire [4:0] rs1, rs2, rd;
 
@@ -117,14 +117,14 @@ module thinpad_top
 
     wire [31:0] immOut, ramDataOut;
     wire [31:0] rs1Data, rs2Data, aluRes;
-    wire [31:0] ramAddr;  //origin address, undecoded
+    wire [31:0] ramAddr;
 
     reg  [31:0] pcSrc;
-    reg  [31:0] regA, regB, regC;  // reg for ALU
+    reg  [31:0] regA, regB, regC;
     reg  [31:0] regInstruction, regRam;
     reg  [31:0] data2RF, oprandA, oprandB;
 
-    // NOTE: ������ Controller
+
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             regA           <= 32'b0;
@@ -161,12 +161,12 @@ module thinpad_top
             if (instructionWr)
                 regInstruction <= ramDataOut;
 
-            // if (exceptionFlag)
+
                 mcauseReg <= decodeMcause;
         end
     end
 
-    // NOTE: MUX
+
     assign csrAddr = regInstruction[31:20];
 
     assign rs1 = regInstruction[19:15];
@@ -187,8 +187,8 @@ module thinpad_top
             3'b000 : data2RF = regRam;
             3'b001 : data2RF = regC;
             3'b010 : data2RF = pc;
-            3'b011 : data2RF = immOut; //Ϊ��LUIָ���11���ó���ѡ�����������������ɵ�����12λ�������
-            3'b100 : data2RF = csrDataOut;  //exception
+            3'b011 : data2RF = immOut;
+            3'b100 : data2RF = csrDataOut;
             default: data2RF = 0;
         endcase
 
@@ -207,7 +207,7 @@ module thinpad_top
         endcase
     end
 
-    // NOTE: �������
+
     RegFile regFile(
         .clk(clk),
         .rst(rst),

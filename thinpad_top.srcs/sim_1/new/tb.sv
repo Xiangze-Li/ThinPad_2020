@@ -48,7 +48,7 @@ wire uart_tsre;          //数据发送完毕标志
 //Windows需要注意路径分隔符的转义，例如"D:\\foo\\bar.bin"
 //parameter BASE_RAM_INIT_FILE = "D:\\kernel_int_4M.bin"; //BaseRAM初始化文件，请修改为实际的绝对路径
 parameter BASE_RAM_INIT_FILE = "D:\\rv_cpu\\Kernels\\kernel_page_4M.bin"; //BaseRAM初始化文件，请修改为实际的绝对路径
-parameter EXT_RAM_INIT_FILE = "D:\\rv_cpu\\Kernels\random_4M.bin";    //ExtRAM初始化文件，请修改为实际的绝对路径
+parameter EXT_RAM_INIT_FILE = "D:\\rv_cpu\\Kernels\\random_4M.bin";    //ExtRAM初始化文件，请修改为实际的绝对路径
 parameter FLASH_INIT_FILE = "/tmp/kernel.elf";    //Flash初始化文件，请修改为实际的绝对路径
 
 assign rxd = 1'b1; //idle state
@@ -58,7 +58,7 @@ initial begin
     reset_btn = 1;
     #100;
     reset_btn = 0;
-    #7_000_000;
+    #4_000_000;
     cpld.pc_send_byte(8'h57);
     #150000;
     cpld.pc_send_byte(8'h41); // A
@@ -71,7 +71,7 @@ initial begin
     #50000;
     cpld.pc_send_byte(8'h80);
     #50000;
-    cpld.pc_send_byte(8'h04);
+    cpld.pc_send_byte(8'h08);
     #50000;
     cpld.pc_send_byte(8'h00);
     #50000;
@@ -79,11 +79,19 @@ initial begin
     #50000;
     cpld.pc_send_byte(8'h00);
     #50000;
-    cpld.pc_send_byte(8'h67);
+    cpld.pc_send_byte(8'hB7);
+    #50000;
+    cpld.pc_send_byte(8'h02);
+    #50000;
+    cpld.pc_send_byte(8'hC1);
+    #50000;
+    cpld.pc_send_byte(8'h7F);
+    #50000;    
+    cpld.pc_send_byte(8'hA3);
     #50000;
     cpld.pc_send_byte(8'h80);
     #50000;
-    cpld.pc_send_byte(8'h00);
+    cpld.pc_send_byte(8'h62);
     #50000;
     cpld.pc_send_byte(8'h00);
     #50000;
@@ -97,26 +105,6 @@ initial begin
     #50000;
     cpld.pc_send_byte(8'h00);
     #50000;
-//    cpld.pc_send_byte(8'h04);
-//    #50000;
-//    cpld.pc_send_byte(8'h00);
-//    #50000;
-//    cpld.pc_send_byte(8'h00);
-//    #50000;
-//    cpld.pc_send_byte(8'h00);
-
-
-
-    // for (integer i = 0; i < 20; i = i+1) begin
-    //     #100; //等待100ns
-    //     clock_btn = 1; //按下手工时钟按钮
-    //     #100; //等待100ns
-    //     clock_btn = 0; //松开手工时钟按钮
-    // end
-    // // 模拟PC通过串口发送字符
-    // cpld.pc_send_byte(8'h32);
-    // #10000;
-    // cpld.pc_send_byte(8'h33);
 end
 
 // 待测试用户设计
