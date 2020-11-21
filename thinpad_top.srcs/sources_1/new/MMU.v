@@ -159,8 +159,8 @@ module MMU(
                         end
                         else begin
                             ramRd <= 1'b0;
+                            ramOutReg <= dataOut;
                             if (dataOut[3] || dataOut[1]) begin  // leaf found
-                                ramOutReg <= dataOut;
                                 state <= S_RAM_BEGIN;
                             end
                             else begin  // pointer to next
