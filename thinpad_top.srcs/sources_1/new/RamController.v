@@ -97,12 +97,12 @@ module RamController
             end
             4'b00_01 : begin
                 outBeBuff = { {24{outData[15]}}, outData[15:8] };
-                inBeBuff = { 16'h0000, dataIn[7:0], 4'h0 };
+                inBeBuff = { 16'h0000, dataIn[7:0], 8'h00 };
                 ramBe = 4'b1101;
             end
             4'b00_10 : begin
                 outBeBuff = { {24{outData[23]}}, outData[23:16] };
-                inBeBuff = { 4'h0, dataIn[7:0], 16'h0000 };
+                inBeBuff = { 8'h00, dataIn[7:0], 16'h0000 };
                 ramBe = 4'b1011;
             end
             4'b00_11 : begin
