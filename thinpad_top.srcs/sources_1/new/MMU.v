@@ -76,7 +76,7 @@ module MMU(
     (32'h80000000 <= virtualAddr && virtualAddr <= 32'h80000FFF && !writeEn) ||
     (32'h80100000 <= virtualAddr && virtualAddr <= 32'h80100FFF && !writeEn)
     );
-    assign transPTEAddr = {ppn, (transI ? virtualAddr[31:22] : virtualAddr[21:12]), 2'b0};
+    assign transPTEAddr = {(transI ? ppn : ramOutReg[31:10]), (transI ? virtualAddr[31:22] : virtualAddr[21:12]), 2'b0};
     assign physicalAddr = {ramOutReg[31:20], (transI ? virtualAddr[21:12] : ramOutReg[19:10]), virtualAddr[11:0]};
 
 

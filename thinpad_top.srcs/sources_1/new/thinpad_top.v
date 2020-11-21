@@ -69,8 +69,8 @@ module thinpad_top
     wire rst_10M, rst_15M, rst_20M, rst_25M;
 
     // NOTE: ѡ��ʱ����Դ
-    assign clk = clk_25M;
-    assign rst = rst_25M;
+    assign clk = clk_10M;
+    assign rst = rst_10M;
 
     // stages
     reg  [2:0] stage;
@@ -167,7 +167,7 @@ module thinpad_top
     end
 
     // NOTE: MUX
-     assign csrAddr = regInstruction[31:20];
+    assign csrAddr = regInstruction[31:20];
 
     assign rs1 = regInstruction[19:15];
     assign rs2 = regInstruction[24:20];
