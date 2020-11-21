@@ -10,6 +10,7 @@ module Decoder(
 
     input wire          addrMisal,
     input wire          addrFault,
+    input wire          pgFault,
 
     output reg          pcWr,
     output reg          pcNowWr,
@@ -613,15 +614,19 @@ module Decoder(
             IDLE :
                 stageNext = IF;
             IF : begin
-                case ({addrFault, addrMisal})
-                    2'b00   : stageNext = ID;
-                    2'b01   : begin // instruction address misaligned
+                case ({pgFault, addrFault, addrMisal})
+                    3'b000   : stageNext = ID;
+                    3'b001   : begin // instruction address misaligned
                         stageNext = EXC;
                         mcauseIn = 32'h00000000;
                     end
-                    2'b10   : begin // instruction address fault
+                    3'b010   : begin // instruction address fault
                         stageNext = EXC;
                         mcauseIn = 32'h00000001;
+                    end
+                    3'b100   : begin // instruction page fault
+                        stageNext = EXC;
+                        mcauseIn = 32'h0000000c;
                     end
                     default : stageNext = ERR;
                 endcase
@@ -693,24 +698,32 @@ module Decoder(
                 endcase
             end
             MEM : begin
-                case ({addrFault, addrMisal, opCode})
-                    {2'b00, OP_L}       : stageNext = WB;
-                    {2'b00, OP_S}       : stageNext = IF;
-                    {2'b01, OP_L}       : begin
+                case ({pgFault, addrFault, addrMisal, opCode})
+                    {3'b000, OP_L}       : stageNext = WB;
+                    {3'b000, OP_S}       : stageNext = IF;
+                    {3'b001, OP_L}       : begin
                         stageNext = EXC;
                         mcauseIn = 32'h00000004;
                     end //load address misaligned
-                    {2'b01, OP_S}       : begin
+                    {3'b001, OP_S}       : begin
                         stageNext = EXC;
                         mcauseIn = 32'h00000006;
                     end //store address misaligned
-                    {2'b10, OP_L}       : begin
+                    {3'b010, OP_L}       : begin
                         stageNext = EXC;
                         mcauseIn = 32'h00000005;
                     end //load address fault
-                    {2'b10, OP_S}       : begin
+                    {3'b010, OP_S}       : begin
                         stageNext = EXC;
                         mcauseIn = 32'h00000007;
+                    end //store address fault
+                    {3'b100, OP_L}       : begin
+                        stageNext = EXC;
+                        mcauseIn = 32'h0000000d;
+                    end //load address fault
+                    {3'b100, OP_S}       : begin
+                        stageNext = EXC;
+                        mcauseIn = 32'h0000000f;
                     end //store address fault
                     default: stageNext = ERR;
                 endcase
