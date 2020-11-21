@@ -680,12 +680,22 @@ module Decoder(
                                         stageNext = EXC;
                                         mcauseIn = 32'h00000003;
                                     end //breakpoint
-                                    12'b001100000010 :
-                                        stageNext = WB; //mret
-                                    default:
-                                        stageNext = ERR;
+                                    12'b001100000010 : begin //mret
+                                        case (mode)
+                                            1'b1: stageNext = WB; //M-mode is legal
+                                            1'b0: begin stageNext = EXC; mcauseIn = 32'h00000002;end //U-mode is illegal
+                                            default: stageNext = ERR;
+                                        endcase
+                                    end
+                                    default: stageNext = IF;
                                 endcase
-                            default: stageNext = WB; //csrćäť¤
+                            default: begin
+                                case (mode)
+                                    1'b1: stageNext = WB; //csrćäť¤
+                                    1'b0: begin stageNext = EXC; mcauseIn = 32'h00000002;end
+                                    default: stageNext = ERR;
+                                endcase
+                            end//stageNext = WB; //csrćäť¤
                         endcase
                     default     : begin
                         stageNext = EXC;
