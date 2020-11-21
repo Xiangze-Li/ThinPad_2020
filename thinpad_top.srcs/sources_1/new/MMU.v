@@ -70,11 +70,11 @@ module MMU(
     assign done = (state == S_EXCP) || (state == S_DONE);
     assign addrFault = pageFault ? 1'b0 : ramAddrFalut;
     assign addrMisal = (pageFault || addrFault) ? 1'b0 : ramAddrMisal;
-    assign userAddrFalut = (
-    (32'h00000000 < virtualAddr && virtualAddr < 32'h002FFFFF) ||
+    assign userAddrFalut = !(
+    (32'h00000000 < virtualAddr && virtualAddr < 32'h002FFFFF && !writeEn) ||
     (32'h7FC10000 < virtualAddr && virtualAddr < 32'h7FFFFFFF) ||
-    (32'h80000000 < virtualAddr && virtualAddr < 32'h80000FFF) ||
-    (32'h80100000 < virtualAddr && virtualAddr < 32'h80100FFF)
+    (32'h80000000 < virtualAddr && virtualAddr < 32'h80000FFF && !writeEn) ||
+    (32'h80100000 < virtualAddr && virtualAddr < 32'h80100FFF && !writeEn)
     );
     assign transPTEAddr = {ppn, (transI ? virtualAddr[31:22] : virtualAddr[21:12]), 2'b0};
     assign physicalAddr = {ramOutReg[31:20], (transI ? virtualAddr[21:12] : ramOutReg[19:10]), virtualAddr[11:0]};
