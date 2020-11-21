@@ -94,7 +94,7 @@ module thinpad_top
     wire aluFlagZero, aluRorI;
     // exception
     wire exceptionFlag, excepRetFlag;
-    wire addrMisal, addrFalut;
+    wire addrMisal, addrFalut, pageFault;
     wire cpuMode;
     wire [1:0] csrWrOp;
     wire [11:0] csrAddr;
@@ -102,6 +102,7 @@ module thinpad_top
     wire [31:0] csrDataOut;
     wire [31:0] excepHandleAddr, epcOut;
     reg  [31:0] mcauseReg;
+    wire [21:0] ppn;
 
 
     wire [1:0] aluASel, aluBSel;  // ALU opr A, ALU opr B
@@ -237,7 +238,8 @@ module thinpad_top
 
         .mode(cpuMode),
         .handlerAddr(excepHandleAddr),
-        .epcOut(epcOut)
+        .epcOut(epcOut),
+        .ppn(ppn)
     );
 
     ImmGen immGen(
@@ -255,6 +257,7 @@ module thinpad_top
         .mode(cpuMode),
         .addrMisal(addrMisal),
         .addrFault(addrFalut),
+        .pgFalut(pageFault),
 
         .pcWr(pcWr),
         .pcNowWr(pcNowWr),
@@ -292,18 +295,21 @@ module thinpad_top
         .flagZero(aluFlagZero)
     );
 
-    RamController ramController(
+    MMU mmu(
         .clk(clk),
         .rst(rst),
 
         .dataIn(regB),
         .dataOut(ramDataOut),
-        .address(ramAddr),
+        .virtualAddr(ramAddr),
 
-        .ramWr(ramWr),
-        .ramRd(ramRd),
+        .writeEn(ramWr),
+        .readEn(ramRd),
         .ramByte(ramByte),
-        .ramDone(ramDone),
+        .done(ramDone),
+
+        .mode(cpuMode),
+        .ppn(ppn),
 
         .baseIO(base_ram_data),
         .baseAddr(base_ram_addr),
@@ -326,7 +332,8 @@ module thinpad_top
         .uartWrN(uart_wrn),
 
         .addrMisal(addrMisal),
-        .addrFault(addrFalut)
+        .addrFault(addrFalut),
+        .pageFault(pageFault)
     );
 
     ClkGen clkgen(
