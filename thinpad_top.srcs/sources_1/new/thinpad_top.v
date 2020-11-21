@@ -94,7 +94,7 @@ module thinpad_top
     wire aluFlagZero, aluRorI;
     // exception
     wire exceptionFlag, excepRetFlag;
-    wire addrMisal, addrFalut, pageFault;
+    wire addrMisal, addrFault, pageFault;
     wire cpuMode;
     wire [1:0] csrWrOp;
     wire [11:0] csrAddr;
@@ -256,8 +256,8 @@ module thinpad_top
 
         .mode(cpuMode),
         .addrMisal(addrMisal),
-        .addrFault(addrFalut),
-        .pgFalut(pageFault),
+        .addrFault(addrFault),
+//        .pgFault(pageFault),
 
         .pcWr(pcWr),
         .pcNowWr(pcNowWr),
@@ -332,7 +332,7 @@ module thinpad_top
         .uartWrN(uart_wrn),
 
         .addrMisal(addrMisal),
-        .addrFault(addrFalut),
+        .addrFault(addrFault),
         .pageFault(pageFault)
     );
 

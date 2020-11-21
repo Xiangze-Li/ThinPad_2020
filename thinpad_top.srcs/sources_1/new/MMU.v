@@ -57,9 +57,9 @@ module MMU(
     reg ramWr, ramRd;
     reg [31:0] ramAddr;
     reg [31:0] ramOutReg;
-    wire ramAddrFalut, ramAddrMisal;
+    wire ramAddrFault, ramAddrMisal;
 
-    wire userAddrFalut;  // don't check if in user mode
+    wire userAddrFault;  // don't check if in user mode
 
     // translation vars. refer to priviledged doc p75
     reg transI;
@@ -68,9 +68,9 @@ module MMU(
 
 
     assign done = (state == S_EXCP) || (state == S_DONE);
-    assign addrFault = pageFault ? 1'b0 : ramAddrFalut;
+    assign addrFault = pageFault ? 1'b0 : ramAddrFault;
     assign addrMisal = (pageFault || addrFault) ? 1'b0 : ramAddrMisal;
-    assign userAddrFalut = !(
+    assign userAddrFault = !(
     (32'h00000000 < virtualAddr && virtualAddr < 32'h002FFFFF && !writeEn) ||
     (32'h7FC10000 < virtualAddr && virtualAddr < 32'h7FFFFFFF) ||
     (32'h80000000 < virtualAddr && virtualAddr < 32'h80000FFF && !writeEn) ||
@@ -114,7 +114,7 @@ module MMU(
         .uartWrN(uartWrN),
 
         .addrMisal(ramAddrMisal),
-        .addrFault(ramAddrFalut)
+        .addrFault(ramAddrFault)
     );
 
 
@@ -136,7 +136,7 @@ module MMU(
                             state <= S_RAM_BEGIN;
                         end
                         else begin  // user mode
-                            if (userAddrFalut) begin
+                            if (userAddrFault) begin
                                 pageFault <= 1'b1;
                                 state <= S_EXCP;
                             end
@@ -154,7 +154,7 @@ module MMU(
                 end
                 S_FETCH_PTE_DONE: begin
                     if (ramDone) begin
-                        if (ramAddrMisal || ramAddrFalut) begin
+                        if (ramAddrMisal || ramAddrFault) begin
                             state <= S_EXCP;
                         end
                         else begin
@@ -184,7 +184,7 @@ module MMU(
                 end
                 S_RAM_DONE: begin
                     if (ramDone) begin
-                        if (ramAddrMisal || ramAddrFalut) begin
+                        if (ramAddrMisal || ramAddrFault) begin
                             state <= S_EXCP;
                         end
                         else begin
@@ -195,12 +195,12 @@ module MMU(
                     end
                 end
                 S_DONE: begin
-                    if (!writeEn && !readEn) begin
+//                    if (!writeEn && !readEn) begin
                         ramRd <= 1'b0;
                         ramWr <= 1'b0;
                         state <= S_IDLE;
                         pageFault <= 1'b0;
-                    end
+//                    end
                 end
                 S_EXCP: begin
                     if (!writeEn && !readEn) begin
