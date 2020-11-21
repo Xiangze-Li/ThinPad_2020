@@ -55,6 +55,7 @@ module MMU(
 
     wire ramDone;
     reg ramWr, ramRd;
+    reg [1:0] ramByteReg;
     reg [31:0] ramAddr;
     reg [31:0] ramOutReg;
     wire ramAddrFault, ramAddrMisal;
@@ -90,7 +91,7 @@ module MMU(
 
         .ramWr(ramWr),
         .ramRd(ramRd),
-        .ramByte(ramByte),
+        .ramByte(ramByteReg),
         .ramDone(ramDone),
 
         .baseIO(baseIO),
@@ -127,6 +128,7 @@ module MMU(
             transI <= 1'b1;
             ramAddr <= 32'b0;
             ramOutReg <= 32'b0;
+            ramByteReg <= 2'b10;
         end
         else begin
             case (state)
@@ -151,6 +153,7 @@ module MMU(
                     ramAddr <= transPTEAddr;
                     ramRd   <= 1'b1;
                     state   <= S_FETCH_PTE_DONE;
+                    ramByteReg <= 2'b10;
                 end
                 S_FETCH_PTE_DONE: begin
                     if (ramDone) begin
@@ -181,6 +184,7 @@ module MMU(
                     ramRd   <= readEn;
                     ramWr   <= writeEn;
                     state   <= S_RAM_DONE;
+                    ramByteReg <= ramByte;
                 end
                 S_RAM_DONE: begin
                     if (ramDone) begin
