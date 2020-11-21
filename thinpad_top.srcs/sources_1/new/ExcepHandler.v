@@ -17,10 +17,12 @@ module ExcepHandler
 
     output wire         mode,
     output wire [31:0]  handlerAddr,
-    output wire [31:0]  epcOut
+    output wire [31:0]  epcOut,
+    output wire         satpMode,
+    output wire [21:0]  ppn
 );
     localparam CSR_SIZE = 6;
-    reg [31:0] CSRs [CSR_SIZE-1:0];
+    reg [31:0] CSRs [CSR_SIZE:0];
 
     /*
         CSR addr    true addr   name        part
@@ -29,6 +31,8 @@ module ExcepHandler
         0x340       2           mscratch    [31:0]
         0x341       3           mepc        [31:0]
         0x342       4           mcause      [31] Interrupt, [30:0] ExcepCode
+        0x180       5           stap        [31] MODE, [21:0] PPN
+        other       6           JUNK
     */
 
     reg [2:0] trueAddr;
@@ -39,16 +43,20 @@ module ExcepHandler
             12'h340 : trueAddr = 3'd2;
             12'h341 : trueAddr = 3'd3;
             12'h342 : trueAddr = 3'd4;
-            default : trueAddr = 3'd5;
+            12'h180 : trueAddr = 3'd5;
+            default : trueAddr = CSR_SIZE;
         endcase
     end
 
     wire [31:0] vectorAddr;
     assign vectorAddr = { 2'b00, CSRs[1][31:2]+(CSRs[4][29:0]<<2) };
 
-    assign handlerAddr = (CSRs[1][1:0] == 2'b00 ? CSRs[1] : vectorAddr);
+    // assign handlerAddr = (CSRs[1][1:0] == 2'b00 ? CSRs[1] : vectorAddr);
+    assign handlerAddr = (mcauseIn[31] ? vectorAddr : CSRs[1]);
     assign epcOut = CSRs[3];
     assign csrDataOut = CSRs[trueAddr];
+    assign satpMode = CSRs[5][31];
+    assign ppn = CSRs[5][21:0];
 
     parameter [1:0]
         MODE_U = 2'b00,
@@ -59,7 +67,7 @@ module ExcepHandler
     integer i;
     always @(posedge clk, posedge rst) begin
         if (rst) begin
-            for (i=0; i<CSR_SIZE; i=i+1) begin
+            for (i=0; i<=CSR_SIZE; i=i+1) begin
                 CSRs[i] <= 32'b0;
             end
             mode_R <= MODE_M;
