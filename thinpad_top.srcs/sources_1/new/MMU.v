@@ -43,15 +43,41 @@ module MMU(
 );
 
     localparam [3:0]
-        S_IDLE          = 4'b0000,
-        S_RAM_BEGAIN    = 4'b1000,
-        S_EXCP          = 4'b1111;
+        S_IDLE              = 4'b0000,
+        S_FETCH_PTE_BEGIN   = 4'b0001,
+        S_FETCH_PTE_DONE    = 4'b0010,
+        S_RAM_BEGIN         = 4'b1000,
+        S_RAM_DONE          = 4'b1001,
+        S_DONE              = 4'b1110,
+        S_EXCP              = 4'b1111;
 
     reg [3:0] state;
 
     wire ramDone;
     reg ramWr, ramRd;
-    reg [31:0] physicalAddr;
+    reg [31:0] ramAddr;
+    reg [31:0] ramOutReg;
+    wire ramAddrFalut, ramAddrMisal;
+
+    wire userAddrFalut;  // don't check if in user mode
+
+    // translation vars. refer to priviledged doc p75
+    reg transI;
+    wire [33:0] transPTEAddr;
+    wire [33:0] physicalAddr;
+
+
+    assign done = (state == S_EXCP) || (state == S_DONE);
+    assign addrFault = pageFault ? 1'b0 : ramAddrFalut;
+    assign addrMisal = (pageFault || addrFault) ? 1'b0 : ramAddrMisal;
+    assign userAddrFalut = (
+    (32'h00000000 < virtualAddr && virtualAddr < 32'h002FFFFF) ||
+    (32'h7FC10000 < virtualAddr && virtualAddr < 32'h7FFFFFFF) ||
+    (32'h80000000 < virtualAddr && virtualAddr < 32'h80000FFF) ||
+    (32'h80100000 < virtualAddr && virtualAddr < 32'h80100FFF)
+    );
+    assign transPTEAddr = {ppn, (transI ? virtualAddr[31:22] : virtualAddr[21:12]), 2'b0};
+    assign physicalAddr = {ramOutReg[31:20], (transI ? virtualAddr[21:12] : ramOutReg[19:10]), virtualAddr[11:0]};
 
 
     RamController ramController(
@@ -60,7 +86,7 @@ module MMU(
 
         .dataIn(dataIn),
         .dataOut(dataOut),
-        .address(physicalAddr),
+        .address(ramAddr),
 
         .ramWr(ramWr),
         .ramRd(ramRd),
@@ -87,8 +113,8 @@ module MMU(
         .uartRdN(uartRdN),
         .uartWrN(uartWrN),
 
-        .addrMisal(addrMisal),
-        .addrFault(addrFault)
+        .addrMisal(ramAddrMisal),
+        .addrFault(ramAddrFalut)
     );
 
 
@@ -98,18 +124,91 @@ module MMU(
             pageFault <= 1'b0;
             ramWr <= 1'b0;
             ramRd <= 1'b0;
-            physicalAddr <= 32'b0;
+            transI <= 1'b1;
+            ramAddr <= 32'b0;
+            ramOutReg <= 32'b0;
         end
         else begin
             case (state)
                 S_IDLE: begin
-                    if (mode) begin  // machine mode
-                        physicalAddr <= virtualAddr;
-                        state <= S_RAM_BEGAIN;
+                    if (writeEn || readEn) begin
+                        if (mode) begin  // machine mode
+                            state <= S_RAM_BEGIN;
+                        end
+                        else begin  // user mode
+                            if (userAddrFalut) begin
+                                pageFault <= 1'b1;
+                                state <= S_EXCP;
+                            end
+                            else begin
+                                state <= S_FETCH_PTE_BEGIN;
+                                transI <= 1'b1;
+                            end
+                        end
                     end
-                    else begin
-//                        if (
+                end
+                S_FETCH_PTE_BEGIN: begin
+                    ramAddr <= transPTEAddr;
+                    ramRd   <= 1'b1;
+                    state   <= S_FETCH_PTE_DONE;
+                end
+                S_FETCH_PTE_DONE: begin
+                    if (ramDone) begin
+                        if (ramAddrMisal || ramAddrFalut) begin
+                            state <= S_EXCP;
+                        end
+                        else begin
+                            ramRd <= 1'b0;
+                            if (dataOut[3] || dataOut[1]) begin  // leaf found
+                                ramOutReg <= dataOut;
+                                state <= S_RAM_BEGIN;
+                            end
+                            else begin  // pointer to next
+                                if (!transI) begin  // i == 0. page fault
+                                    pageFault <= 1'b1;
+                                    state <= S_EXCP;
+                                end
+                                else begin  // i == 1, fetch pte
+                                    transI <= 1'b0;
+                                    state <= S_FETCH_PTE_BEGIN;
+                                end
+                            end
+                        end
                     end
+                end
+                S_RAM_BEGIN: begin
+                    ramAddr <= mode ? virtualAddr : ramOutReg;
+                    ramRd   <= readEn;
+                    ramWr   <= writeEn;
+                    state   <= S_RAM_DONE;
+                end
+                S_RAM_DONE: begin
+                    if (ramDone) begin
+                        if (ramAddrMisal || ramAddrFalut) begin
+                            state <= S_EXCP;
+                        end
+                        else begin
+                            ramRd <= 1'b0;
+                            ramWr <= 1'b0;
+                            state <= S_DONE;
+                        end
+                    end
+                end
+                S_DONE: begin
+                    if (!writeEn && !readEn) begin
+                        state <= S_IDLE;
+                        pageFault <= 1'b0;
+                    end
+                end
+                S_EXCP: begin
+                    if (!writeEn && !readEn) begin
+                        ramRd <= 1'b0;
+                        ramWr <= 1'b0;
+                        state <= S_IDLE;
+                        pageFault <= 1'b0;
+                    end
+                end
+                default: begin
                 end
             endcase
         end
